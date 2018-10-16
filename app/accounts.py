@@ -2,7 +2,7 @@ import re
 
 
 class Account:
-    """This class the logic for managing admin and user accounts"""
+    """This class holds the logic for managing accounts"""
 
     def __init__(self):
         self.accounts = []  # A data structure to hold admin and user accounts
@@ -25,9 +25,10 @@ class Account:
         if user in self.accounts:
             return True
 
-    def register(self, name, company_id, phone_number, email_address, username, password):
+    def register(self, name, company_id, phone_number, email_address, username, password, admin=True):
         """
         This creates an account for a user
+        :param admin:
         :param name:
         :param company_id:
         :param phone_number:
@@ -42,7 +43,8 @@ class Account:
             "phone_number": phone_number,
             "email_address": email_address,
             "username": username,
-            "password": password
+            "password": password,
+            "admin": admin
         }
         self.accounts.append(user)
         return self.accounts
