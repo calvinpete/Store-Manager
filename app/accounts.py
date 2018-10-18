@@ -25,7 +25,7 @@ class Account:
         if user in self.accounts:
             return True
 
-    def register(self, name, company_id, phone_number, email_address, username, password, admin=True):
+    def register(self, name, company_id, phone_number, email_address, username, password, admin=False):
         """
         This creates an account for a user
         :param admin:
@@ -37,11 +37,13 @@ class Account:
         :param password:
         :return:
         """
+        user_id = len(self.accounts) + 1
         user = {
             "name": name,
             "company_id": company_id,
             "phone_number": phone_number,
             "email_address": email_address,
+            "user_id": user_id,
             "username": username,
             "password": password,
             "admin": admin
@@ -71,6 +73,17 @@ class Account:
             if password == account["password"]:
                 return True
 
+    def promote_user(self, user_id):
+        """
+        This gives admin rights to a user
+        :param user_id:
+        :return:
+        """
+        for user in self.accounts:
+            if user_id == user["user_id"]:
+                user["admin"] = True
+                return user
+
     @staticmethod
     def validate_email_address(email_address):
         """
@@ -78,7 +91,7 @@ class Account:
         :param email_address:
         :return:
         """
-        email = re.compile("(^[a-zA-Z0-9_-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]$)")
+        email = re.compile("(^[a-zA-Z0-9_-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
         match = email.match(email_address)
         if match:
             return True
