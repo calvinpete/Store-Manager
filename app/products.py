@@ -21,13 +21,13 @@ class Product:
             if category == key:
                 return True
 
-    def add_product(self, category, product_name, quantity, cost, price):
+    def add_product(self, category, product_name, quantity, details, price):
         """
         This adds a product to the inventory
         :param category:
         :param product_name:
         :param quantity:
-        :param cost:
+        :param details:
         :param price:
         :return:
         """
@@ -35,22 +35,23 @@ class Product:
         product = {
             "product_id": product_id,
             "product_name": product_name,
+            "details": details,
             "quantity": quantity,
-            "cost": cost,
             "price": price
         }
         self.stock[category].append(product)
         return self.stock
 
-    def check_product(self, category, product_id):
+    def check_product(self, category, product_name, details):
         """
         This checks if the product exists
+        :param product_name:
+        :param details:
         :param category:
-        :param product_id:
         :return:
         """
         for product in self.stock[category]:
-            if product_id == product["product_id"]:
+            if product_name == product["product_name"] and product["details"] == details:
                 return True
 
     def get_product(self, category, product_id):

@@ -51,6 +51,7 @@ class Sales:
                     "product_id": pdt_id,
                     "product_name": pdt["product_name"],
                     "category": category,
+                    "details": pdt["details"],
                     "quantity_sold": qty,
                     "amount": qty * pdt["price"],
                     "status": status
