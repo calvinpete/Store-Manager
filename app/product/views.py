@@ -62,7 +62,7 @@ def add_product(current_user, category):
     if not item.check_category(category):
         return jsonify({"message": "{} category does not exist".format(category)}), 404
 
-    if not item.check_product(category, product_name, details):
+    if not item.check_product_existence(category, product_name, details):
         item.add_product(category, product_name, quantity, details, price)
         return jsonify({"message": "Product successfully added"}), 201
     else:
@@ -73,3 +73,18 @@ def add_product(current_user, category):
 @token_required
 def get_all_products(current_user):
     return jsonify(item.get_all_products()), 200
+
+
+@app.route('/store-manager/api/v1/<category>/products/<product_id>', methods=['GET'])
+@token_required
+def get_single_product(current_user, category, product_id):
+
+    try:
+        if not item.check_category(category):
+            return jsonify({"message": "{} category does not exist".format(category)}), 404
+
+        return jsonify(item.get_single_product(category, product_id)), 200
+
+    except IndexError:
+        return jsonify({"message": "Product does not exist"}), 404
+

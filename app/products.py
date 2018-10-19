@@ -42,9 +42,9 @@ class Product:
         self.stock[category].append(product)
         return self.stock
 
-    def check_product(self, category, product_name, details):
+    def check_product_existence(self, category, product_name, details):
         """
-        This checks if the product exists
+        This checks if the product already exists
         :param product_name:
         :param details:
         :param category:
@@ -54,16 +54,14 @@ class Product:
             if product_name == product["product_name"] and product["details"] == details:
                 return True
 
-    def get_product(self, category, product_id):
+    def get_single_product(self, category, product_id):
         """
-        This fetches a product's details
+        This fetches a single product
         :param category:
         :param product_id:
         :return:
         """
-        for product in self.stock[category]:
-            if self.check_product(category, product_id):
-                return product
+        return self.stock[category][int(product_id) - 1]
 
     def get_all_products(self):
         """
