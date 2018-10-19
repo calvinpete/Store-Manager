@@ -67,3 +67,9 @@ def add_product(current_user, category):
         return jsonify({"message": "Product successfully added"}), 201
     else:
         return jsonify({"message": "{} {} already exists".format(details, product_name)}), 404
+
+
+@app.route('/store-manager/api/v1/products', methods=['GET'])
+@token_required
+def get_all_products(current_user):
+    return jsonify(item.get_all_products()), 200
