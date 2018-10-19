@@ -11,6 +11,16 @@ class Product:
         """
         self.stock[category] = []
 
+    def check_category(self, category):
+        """
+        This checks if the category exists
+        :param category:
+        :return:
+        """
+        for key in self.stock.keys():
+            if category == key:
+                return True
+
     def add_product(self, category, product_name, quantity, cost, price):
         """
         This adds a product to the inventory
