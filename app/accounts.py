@@ -7,23 +7,16 @@ class Account:
     def __init__(self):
         self.accounts = []  # A data structure to hold admin and user accounts
 
-    def check_user(self, username, email_address, password, phone_number):
+    def check_user(self, email_address):
         """
         This checks if the user already has an account
-        :param username:
         :param email_address:
-        :param password:
-        :param phone_number
         :return:
         """
-        user = {
-            "username": username,
-            "email_address": email_address,
-            "password": password,
-            "phone_number": phone_number
-        }
-        if user in self.accounts:
-            return True
+        for account in self.accounts:
+            # checks if the user is registered
+            if email_address == account["email_address"]:
+                return True
 
     def register(self, name, company_id, phone_number, email_address, username, password, admin=False):
         """
@@ -51,16 +44,38 @@ class Account:
         self.accounts.append(user)
         return self.accounts
 
-    def get_user(self, username):
+    @staticmethod
+    def check_input_validity(**kwargs):
         """
-        This fetches the username if it exists
-        :param username:
+        This checks if the parameters are empty
+        :param kwargs:
+        :return:
+        """
+        for (k, v) in kwargs.items():
+            if len(v) == 0:
+                return True
+
+    @staticmethod
+    def check_input_type(**kwargs):
+        """
+        This checks if the parameters are not strings
+        :param kwargs:
+        :return:
+        """
+        for (k, v) in kwargs.items():
+            if isinstance(v, int) or isinstance(v, float) or isinstance(v, list):
+                return True
+
+    def get_user(self, email_address):
+        """
+        This fetches the email_address if it exists
+        :param email_address:
         :return:
         """
         for account in self.accounts:
             # checks if the user is registered
-            if username == account["username"]:
-                return account["username"]
+            if email_address == account["email_address"]:
+                return account["user_id"]
 
     def check_password(self, password):
         """
