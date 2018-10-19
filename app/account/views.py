@@ -104,8 +104,9 @@ def token_required(f):
         try:
             data = jwt.decode(token, Config.SECRET_KEY)
             current_user = staff.get_user(email_address=data["email_address"])
-        except jwt.DecodeError:
+        except:
             return jsonify({"message": "Token is invalid"}), 401
         return f(current_user, *args, **kwargs)
 
     return decorated
+

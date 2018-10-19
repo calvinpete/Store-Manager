@@ -77,6 +77,16 @@ class Account:
             if email_address == account["email_address"]:
                 return account["user_id"]
 
+    def check_admin(self, user_id):
+        """
+        This checks if user has admin rights
+        :param user_id:
+        :return:
+        """
+        for user in self.accounts:
+            if user_id == user["user_id"]:
+                return user["admin"]
+
     def check_password(self, password):
         """
         This checks if the password exists
