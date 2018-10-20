@@ -34,8 +34,17 @@ def create_sale_record(current_user):
             sale_type=sale_type):
         return jsonify({"message": "Values are required"}), 400
 
-    if not staff_sales.check_available_product(category, product_id, quantity):
-        return jsonify({"message": "There is not enough to sale"}), 404
+    try:
 
-    staff_sales.sale_product(category, product_id, quantity, sale_type, current_user)
-    return jsonify({"message": "Sale record successfully created"}), 201
+        if not staff_sales.check_available_product(category, product_id, quantity):
+            return jsonify({"message": "There is not enough to sale"}), 404
+
+        staff_sales.sale_product(category, product_id, quantity, sale_type, current_user)
+        return jsonify({"message": "Sale record successfully created"}), 201
+
+    except KeyError:
+        return jsonify({"message": "{} category does not exist".format(category)}), 404
+
+    except IndexError:
+        return jsonify({"message": "Product does not exist"}), 404
+
