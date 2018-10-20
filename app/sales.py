@@ -3,19 +3,10 @@ from app.products import item
 
 
 class Sales:
-    """This class holds the logic for managing sales"""
+    """This class holds the logic for managing sale"""
 
     def __init__(self):
         self.sales_records = {}  # A data structure for holding sale records
-
-    def new_record(self, username):
-        """
-        This creates a list to hold sale records for a single staff attendant
-        :param username:
-        :return:
-        """
-        self.sales_records[username] = []
-        return self.sales_records
 
     @staticmethod
     def check_available_product(category, pdt_id, qty):
@@ -26,47 +17,46 @@ class Sales:
         :param pdt_id:
         :return:
         """
-        for product in item.stock[category]:
-            if product["product_id"] == pdt_id:
-                if product["quantity"] >= qty:
-                    return True
+        pdt = item.stock[category][int(pdt_id) - 1]
+        if int(pdt["quantity"]) >= int(qty) >= 1:
+            return True
 
-    def sale_product(self, category, pdt_id, qty, status, username):
+    def sale_product(self, category, pdt_id, qty, sale_type, name):
         """
         This creates a sale record after a product is sold
         :param category:
-        :param status:
-        :param username:
+        :param sale_type:
+        :param name:
         :param pdt_id:
         :param qty:
         :return:
         """
-        for pdt in item.stock[category]:
-            if pdt["product_id"] == pdt_id:
-                pdt["quantity"] -= qty
-                record_id = len(self.sales_records) + 1
-                sale_record = {
-                    "record_id": record_id,
-                    "date of sale": str(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")),
-                    "product_id": pdt_id,
-                    "product_name": pdt["product_name"],
-                    "category": category,
-                    "details": pdt["details"],
-                    "quantity_sold": qty,
-                    "amount": qty * pdt["price"],
-                    "status": status
-                }
-                self.sales_records[username].append(sale_record)
-                return self.sales_records
+        pdt = item.stock[category][int(pdt_id)-1]
+        pdt["quantity"] = int(pdt["quantity"]) - int(qty)
+        record_id = len(self.sales_records) + 1
+        sale_record = {
+            "record_id": record_id,
+            "date of sale": str(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")),
+            "product_id": pdt_id,
+            "product_name": pdt["product_name"],
+            "category": category,
+            "details": pdt["details"],
+            "quantity_sold": qty,
+            "amount": int(qty) * int(pdt["price"]),
+            "sale_type": sale_type
+        }
+        self.sales_records[name] = []  # This creates a list to hold sale records for a single staff attendant
+        self.sales_records.get(name).append(sale_record)
+        return self.sales_records
 
-    def get_sale_record(self, username, record_id):
+    def get_sale_record(self, name, record_id):
         """
         This fetches a sale record
-        :param username:
+        :param name:
         :param record_id:
         :return:
         """
-        for record in self.sales_records[username]:
+        for record in self.sales_records[name]:
             if record_id == record["record_id"]:
                 return record
 
@@ -78,4 +68,4 @@ class Sales:
         return self.sales_records
 
 
-sales = Sales()
+staff_sales = Sales()
