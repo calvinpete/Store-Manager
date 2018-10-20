@@ -7,3 +7,4 @@ app.config.from_object(app_config["development"])
 from app.account import views
 from app.product import views
 from app.register import views
+from app.sale import views
