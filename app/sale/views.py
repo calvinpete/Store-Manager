@@ -39,7 +39,7 @@ def create_sale_record(current_user):
         if not staff_sales.check_available_product(category, product_id, quantity):
             return jsonify({"message": "There is not enough to sale"}), 404
 
-        staff_sales.sale_product(category, product_id, quantity, sale_type, current_user)
+        staff_sales.sale_product(category, product_id, quantity, sale_type, staff.get_user_name(current_user))
         return jsonify({"message": "Sale record successfully created"}), 201
 
     except KeyError:
@@ -48,3 +48,13 @@ def create_sale_record(current_user):
     except IndexError:
         return jsonify({"message": "Product does not exist"}), 404
 
+
+@app.route('/store-manager/api/v1/sales/<sale_id>', methods=['GET'])
+@token_required
+def get_single_sale_record(current_user, sale_id):
+
+    try:
+        return jsonify(staff_sales.get_sale_record(staff.get_user_name(current_user), sale_id)), 200
+
+    except IndexError:
+        return jsonify({"message": "Sale record does not exist"}), 201
