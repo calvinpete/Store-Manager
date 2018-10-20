@@ -45,9 +45,15 @@ class Sales:
             "amount": int(qty) * int(pdt["price"]),
             "sale_type": sale_type
         }
-        self.sales_records[name] = []  # This creates a list to hold sale records for a single staff attendant
-        self.sales_records.get(name).append(sale_record)
-        return self.sales_records
+
+        for key in self.sales_records.keys():
+            if name == key:
+                self.sales_records[name].append(sale_record)
+                return self.sales_records
+        else:
+            self.sales_records[name] = []  # A list to hold sale records for a single staff attendant
+            self.sales_records[name].append(sale_record)
+            return self.sales_records
 
     def get_sale_record(self, name, record_id):
         """
@@ -56,9 +62,7 @@ class Sales:
         :param record_id:
         :return:
         """
-        for record in self.sales_records[name]:
-            if record_id == record["record_id"]:
-                return record
+        return self.sales_records[name][int(record_id) - 1]
 
     def get_all_sales(self):
         """
