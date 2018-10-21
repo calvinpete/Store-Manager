@@ -169,6 +169,56 @@ class TestProductApi(TestBase):
         response_message = json.loads(response.data.decode())
         self.assertIn("camp category does not exist", response_message["message"])
 
+    def test_get_all_products(self):
+        """This tests the get all products get route"""
+        self.app.post("/store-manager/api/v1/products", content_type="application/json",
+                      data=json.dumps(self.test_data08))
+        self.app.post("/store-manager/api/v1/Drinks/products", content_type="application/json",
+                      data=json.dumps(self.test_data24), headers={"x-access-token": self.token})
+        response = self.app.get("/store-manager/api/v1/products", content_type="application/json",
+                                headers={"x-access-token": self.token_staff})
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_single_products(self):
+        """This tests the get a single product route"""
+        self.app.post("/store-manager/api/v1/products", content_type="application/json",
+                      data=json.dumps(self.test_data08))
+        self.app.post("/store-manager/api/v1/Drinks/products", content_type="application/json",
+                      data=json.dumps(self.test_data19), headers={"x-access-token": self.token})
+        response = self.app.get("/store-manager/api/v1/Drinks/products/1", content_type="application/json",
+                                headers={"x-access-token": self.token_staff})
+        self.assertEqual(response.status_code, 200)
+
+    def test_invalid_product_id(self):
+        """This tests the get a single product route with an invalid product id"""
+        self.app.post("/store-manager/api/v1/products", content_type="application/json",
+                      data=json.dumps(self.test_data08))
+        self.app.post("/store-manager/api/v1/Drinks/products", content_type="application/json",
+                      data=json.dumps(self.test_data26), headers={"x-access-token": self.token})
+        response = self.app.get("/store-manager/api/v1/Drinks/products/-4", content_type="application/json",
+                                headers={"x-access-token": self.token_staff})
+        self.assertEqual(response.status_code, 404)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Product_id should be a positive integer", response_message["message"])
+
+    def test_non_existent_category(self):
+        """This tests the get a single product route with from a non existent category"""
+        response = self.app.get("/store-manager/api/v1/Blog/products/1", content_type="application/json",
+                                headers={"x-access-token": self.token_staff})
+        self.assertEqual(response.status_code, 404)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Blog category does not exist", response_message["message"])
+
+    def test_non_existent_product(self):
+        """This tests the get a single product route for a non existent product"""
+        self.app.post("/store-manager/api/v1/category", content_type="application/json",
+                      data=json.dumps(self.test_data082), headers={"x-access-token": self.token})
+        response = self.app.get("/store-manager/api/v1/Detergents/products/1", content_type="application/json",
+                                headers={"x-access-token": self.token_staff})
+        self.assertEqual(response.status_code, 404)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Product does not exist", response_message["message"])
+
 
 if __name__ == "__main__":
     unittest.main()

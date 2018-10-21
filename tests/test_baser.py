@@ -40,6 +40,7 @@ class TestBase(unittest.TestCase):
         self.test_data07 = {"category": " "}
         self.test_data08 = {"category": "Drinks"}
         self.test_data081 = {"category": "Juices"}
+        self.test_data082 = {"category": "Detergents"}
         self.test_data09 = {}
         self.test_data10 = {"name": "Mario", "email_address": "MK@gmail.com", "password": "Li/"}
         self.test_data11 = {"email_address": "MK@gmail.com", "password": "Li/"}
