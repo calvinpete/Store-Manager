@@ -47,26 +47,29 @@ def add_product(current_user, category):
 
     if staff.check_input_type(
             product_name=product_name,
-            quantity=quantity,
-            details=details,
-            price=price):
+            details=details):
         return jsonify({"message": "Please a enter a string"}), 400
+
+    if item.check_product_input_type(
+            quantity=quantity,
+            price=price):
+        return jsonify({"message": "Please a enter an integer"}), 400
 
     if staff.check_input_validity(
             product_name=product_name,
-            quantity=quantity,
-            details=details,
-            price=price):
+            details=details):
         return jsonify({"message": "Values are required"}), 400
 
-    if not item.check_category(category):
-        return jsonify({"message": "{} category does not exist".format(category)}), 404
+    try:
 
-    if not item.check_product_existence(category, product_name, details):
-        item.add_product(category, product_name, quantity, details, price)
-        return jsonify({"message": "Product successfully added"}), 201
-    else:
-        return jsonify({"message": "{} {} already exists".format(details, product_name)}), 404
+        if not item.check_product_existence(category, product_name, details):
+            item.add_product(category, product_name, quantity, details, price)
+            return jsonify({"message": "Product successfully added"}), 201
+        else:
+            return jsonify({"message": "{} {} already exists".format(details, product_name)}), 404
+
+    except KeyError:
+        return jsonify({"message": "{} category does not exist".format(category)}), 404
 
 
 @app.route('/store-manager/api/v1/products', methods=['GET'])
@@ -80,11 +83,11 @@ def get_all_products(current_user):
 def get_single_product(current_user, category, product_id):
 
     try:
-        if not item.check_category(category):
-            return jsonify({"message": "{} category does not exist".format(category)}), 404
 
         return jsonify(item.get_single_product(category, product_id)), 200
 
+    except KeyError:
+        return jsonify({"message": "{} category does not exist".format(category)}), 404
+
     except IndexError:
         return jsonify({"message": "Product does not exist"}), 404
-
