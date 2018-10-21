@@ -2,6 +2,7 @@ import unittest
 import json
 from instance.config import app_config
 from app.accounts import Account
+from app.products import Product
 from app.account.views import *
 # from app.register.views import *
 # from app.sale import views
@@ -96,6 +97,16 @@ class TestBase(unittest.TestCase):
                                         data=json.dumps(self.test_data11))
         user_logged_in_data = json.loads(login_test_user.data.decode())
         self.token = user_logged_in_data["token"]
+
+        # Product class test methods
+        self.goods = Product()
+        self.goods.create_category(self.test_data01["category"])
+        self.goods.add_product(
+            self.test_data01["category"],
+            self.test_data24["product_name"],
+            self.test_data24["quantity"],
+            self.test_data24["details"],
+            self.test_data24["price"])
 
     def test_existence(self):
         """
