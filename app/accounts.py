@@ -18,26 +18,20 @@ class Account:
             if email_address == account["email_address"]:
                 return True
 
-    def register(self, name, company_id, phone_number, email_address, username, password, admin=False):
+    def register(self, name, email_address, password, admin=False):
         """
         This creates an account for a user
         :param admin:
         :param name:
-        :param company_id:
-        :param phone_number:
         :param email_address:
-        :param username:
         :param password:
         :return:
         """
         user_id = len(self.accounts) + 1
         user = {
             "name": name,
-            "company_id": company_id,
-            "phone_number": phone_number,
             "email_address": email_address,
             "user_id": user_id,
-            "username": username,
             "password": password,
             "admin": admin
         }
@@ -52,7 +46,7 @@ class Account:
         :return:
         """
         for (k, v) in kwargs.items():
-            if len(v) == 0:
+            if len(v) == 0 or v.isspace():
                 return True
 
     @staticmethod
