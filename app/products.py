@@ -42,6 +42,17 @@ class Product:
         self.stock[category].append(product)
         return self.stock
 
+    @staticmethod
+    def check_product_input_type(**kwargs):
+        """
+        This checks if the product_id, quantity and price are not integers
+        :param kwargs:
+        :return:
+        """
+        for (k, v) in kwargs.items():
+            if isinstance(v, str) or isinstance(v, float) or isinstance(v, list):
+                return True
+
     def check_product_existence(self, category, product_name, details):
         """
         This checks if the product already exists
