@@ -33,9 +33,7 @@ class Sales:
         """
         pdt = item.stock[category][int(pdt_id)-1]
         pdt["quantity"] = int(pdt["quantity"]) - int(qty)
-        record_id = len(self.sales_records) + 1
         sale_record = {
-            "record_id": record_id,
             "date of sale": str(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")),
             "product_id": pdt_id,
             "product_name": pdt["product_name"],
@@ -49,10 +47,12 @@ class Sales:
         for key in self.sales_records.keys():
             if name == key:
                 self.sales_records[name].append(sale_record)
+                sale_record.update(record_id=len(self.sales_records[name]))  # sale record identification
                 return self.sales_records
         else:
             self.sales_records[name] = []  # A list to hold sale records for a single staff attendant
             self.sales_records[name].append(sale_record)
+            sale_record.update(record_id=len(self.sales_records[name]))
             return self.sales_records
 
     def get_sale_record(self, name, record_id):
