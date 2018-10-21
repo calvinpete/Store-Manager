@@ -98,6 +98,8 @@ class TestBase(unittest.TestCase):
         self.test_user27 = {"name": "MattHardy", "email_address": "Hardy@gmail.com", "password": "1290"}
         self.test_user271 = {"email_address": "jamie@gmail.com", "password": "1wpfo"}
         self.test_user28 = {"username": "dy"}
+        self.test_user29 = {"name": "Joe", "email_address": "Joe@gmail.com", "password": "fqc"}
+        self.test_user30 = {"name": "Land", "email_address": "ecs@gmail.com", "password": "r352"}
 
         # sample user
         self.app.post('/store-manager/api/v1/auth/signup', content_type="application/json",

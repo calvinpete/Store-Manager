@@ -22,7 +22,7 @@ def register_staff(current_user):
             name=name,
             email_address=email_address,
             password=password):
-        return jsonify({"message": "Please a enter a string"}), 400
+        return jsonify({"message": "Please enter a string"}), 400
 
     if staff.check_input_validity(
             name=name,
