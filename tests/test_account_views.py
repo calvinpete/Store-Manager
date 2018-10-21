@@ -42,7 +42,7 @@ class AccountRoutesTestCase(TestBase):
         self.assertIn("Values are required", response_message["message"])
 
     def test_name_int_data_type(self):
-        """This tests a post method with username in as an integer"""
+        """This tests a post method with name in as an integer"""
         response = self.app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
                                  data=json.dumps(self.test_user12))
         self.assertTrue(response.status_code, 400)
@@ -50,7 +50,7 @@ class AccountRoutesTestCase(TestBase):
         self.assertIn("Please enter a string", response_message["message"])
 
     def test_name_float_data_type(self):
-        """This tests a post method with username in as a float"""
+        """This tests a post method with name in as a float"""
         response = self.app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
                                  data=json.dumps(self.test_user13))
         self.assertTrue(response.status_code, 400)
@@ -58,7 +58,7 @@ class AccountRoutesTestCase(TestBase):
         self.assertIn("Please enter a string", response_message["message"])
 
     def test_name_list_data_type(self):
-        """This tests a post method with username in as a list"""
+        """This tests a post method with name in as a list"""
         response = self.app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
                                  data=json.dumps(self.test_user14))
         self.assertTrue(response.status_code, 400)
