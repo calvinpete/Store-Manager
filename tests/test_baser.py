@@ -3,7 +3,10 @@ import json
 from instance.config import app_config
 from app.accounts import Account
 from app.products import Product
+from app.sales import Sales, item
 from app.account.views import *
+
+
 # from app.register.views import *
 # from app.sale import views
 # from app.product import views
@@ -13,6 +16,7 @@ class TestBase(unittest.TestCase):
     """
     This class holds a setup method that creates the environment to run unittests on the app's routes
     """
+
     def setUp(self):
         """
         This method runs before each task by:
@@ -98,7 +102,7 @@ class TestBase(unittest.TestCase):
         user_logged_in_data = json.loads(login_test_user.data.decode())
         self.token = user_logged_in_data["token"]
 
-        # Product class test methods
+        # Product class methods
         self.goods = Product()
         self.goods.create_category(self.test_data01["category"])
         self.goods.add_product(
@@ -107,6 +111,23 @@ class TestBase(unittest.TestCase):
             self.test_data24["quantity"],
             self.test_data24["details"],
             self.test_data24["price"])
+
+        # Account class methods
+        self.user_account.register(self.test_user23["name"], self.test_user23["email_address"],
+                                   self.test_user23["password"])
+        self.store_attendant = self.user_account.get_user_name(1)
+
+        # Sales class test methods
+        self.sample_sales = Sales()
+        item.create_category(self.test_data08["category"])
+        item.add_product(
+            self.test_data08["category"],
+            self.test_data28["product_name"],
+            self.test_data28["quantity"],
+            self.test_data28["details"],
+            self.test_data28["price"]
+        )
+        self.sample_sales.sale_product("Drinks", 1, 10, "cash", self.store_attendant)
 
     def test_existence(self):
         """
