@@ -31,6 +31,7 @@ class TestBase(unittest.TestCase):
         self.app = app.test_client()
 
         # sample data
+        self.test_data00 = {"category": "Foot wear"}
         self.test_data01 = {"category": "Spices"}
         self.test_data02 = {"category": 5}
         self.test_data03 = {"category": 6.8}
@@ -41,6 +42,8 @@ class TestBase(unittest.TestCase):
         self.test_data09 = {}
         self.test_data10 = {"name": "Mario", "email_address": "MK@gmail.com", "password": "Li/"}
         self.test_data11 = {"email_address": "MK@gmail.com", "password": "Li/"}
+        self.test_data101 = {"name": "clint", "email_address": "hope@gmail.com", "password": "///"}
+        self.test_data111 = {"email_address": "hope@gmail.com", "password": "///"}
         self.test_data12 = {"product_name": "Splash", "quantity": 12, "details": "500ml Mango", "price": 6500}
         self.test_data13 = {}
         self.test_data14 = {"product_name": 100, "quantity": 12, "details": "500ml Mango", "price": 6500}
@@ -108,6 +111,14 @@ class TestBase(unittest.TestCase):
                                         data=json.dumps(self.test_data11))
         user_logged_in_data = json.loads(login_test_user.data.decode())
         self.token = user_logged_in_data["token"]
+
+        # sample non admin user
+        self.app.post('/store-manager/api/v1/register', content_type="application/json",
+                      data=json.dumps(self.test_data101), headers={'x-access-token': self.token})
+        login_test_staff = self.app.post('/store-manager/api/v1/auth/login', content_type="application/json",
+                                         data=json.dumps(self.test_data111))
+        staff_logged_in_data = json.loads(login_test_staff.data.decode())
+        self.token_staff = staff_logged_in_data["token"]
 
         # Product class methods
         self.goods = Product()

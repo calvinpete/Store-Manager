@@ -19,7 +19,7 @@ def create_category(current_user):
     category = data['category']
 
     if staff.check_input_type(category=category):
-        return jsonify({"message": "Please a enter a string"}), 400
+        return jsonify({"message": "Please enter a string"}), 400
 
     if staff.check_input_validity(category=category):
         return jsonify({"message": "Value for category is required"}), 400
