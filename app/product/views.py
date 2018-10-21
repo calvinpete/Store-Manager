@@ -48,12 +48,12 @@ def add_product(current_user, category):
     if staff.check_input_type(
             product_name=product_name,
             details=details):
-        return jsonify({"message": "Please a enter a string"}), 400
+        return jsonify({"message": "Please enter a string"}), 400
 
     if item.check_product_input_type(
             quantity=quantity,
             price=price):
-        return jsonify({"message": "Please a enter an integer"}), 400
+        return jsonify({"message": "Please enter an integer"}), 400
 
     if staff.check_input_validity(
             product_name=product_name,

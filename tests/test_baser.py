@@ -39,6 +39,7 @@ class TestBase(unittest.TestCase):
         self.test_data05 = {"category": ""}
         self.test_data07 = {"category": " "}
         self.test_data08 = {"category": "Drinks"}
+        self.test_data081 = {"category": "Juices"}
         self.test_data09 = {}
         self.test_data10 = {"name": "Mario", "email_address": "MK@gmail.com", "password": "Li/"}
         self.test_data11 = {"email_address": "MK@gmail.com", "password": "Li/"}
@@ -63,6 +64,7 @@ class TestBase(unittest.TestCase):
         self.test_data28 = {"product_name": "Riham", "quantity": 12, "details": "300ml Lemon", "price": 1000}
         self.test_data29 = {"product_name": "Afia", "quantity": 12, "details": "300ml Orange", "price": 3500}
         self.test_data30 = {"product_name": "Ribena", "quantity": 12, "details": "250ml Black_current", "price": 1200}
+        self.test_data300 = {"product_name": "Ribena", "quantity": 12}
         self.test_data31 = {"category": "Drinks", "product_id": 1, "quantity": 9, "sale_type": "cash"}
         self.test_data32 = {"category": "Spices", "product_id": 1, "quantity": 3, "sale_type": "credit"}
         self.test_data33 = {}
