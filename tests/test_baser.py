@@ -89,10 +89,15 @@ class TestBase(unittest.TestCase):
         self.test_user20 = {"name": "John Paul", "email_address": "JohnP@gmail.com", "password": ['hW?5', 8]}
         self.test_user21 = {"name": "RonaldMark", "email_address": "markronald.com", "password": "marky-6male"}
         self.test_user22 = {"name": "KingDavid", "email_address": "davidking@gmail.com", "password": "psaLms198?"}
+        self.test_user221 = {"email_address": "davidking@gmail.com", "password": "psaLms198?"}
         self.test_user23 = {"name": "YossiFunke", "email_address": "tinkacalvin@gmail.com", "password": "Rejo78!ce"}
+        self.test_user231 = {"email_address": "tinkacalvin@gmail.com", "password": "Rce"}
         self.test_user24 = {"name": "JohnP", "password": "Hal0-pEt7&"}
         self.test_user25 = {"name": "", "email_address": "JohnP@gmail.com", "password": "Ha90?e=WW"}
         self.test_user26 = {"name": " ", "email_address": "", "password": "Ha90?e=WW"}
+        self.test_user27 = {"name": "MattHardy", "email_address": "Hardy@gmail.com", "password": "1290"}
+        self.test_user271 = {"email_address": "jamie@gmail.com", "password": "1wpfo"}
+        self.test_user28 = {"username": "dy"}
 
         # sample user
         self.app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
