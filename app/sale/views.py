@@ -54,6 +54,10 @@ def create_sale_record(current_user):
 def get_single_sale_record(current_user, sale_id):
 
     try:
+
+        if int(sale_id) <= 0:
+            return jsonify({"message": "sale_id should be a positive integer"}), 404
+
         return jsonify(staff_sales.get_sale_record(staff.get_user_name(current_user), sale_id)), 200
 
     except IndexError:

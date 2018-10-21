@@ -83,6 +83,8 @@ def get_all_products(current_user):
 def get_single_product(current_user, category, product_id):
 
     try:
+        if int(product_id) <= 0:
+            return jsonify({"message": "Product_id should be a positive integer"}), 404
 
         return jsonify(item.get_single_product(category, product_id)), 200
 
