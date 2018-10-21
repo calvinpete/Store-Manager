@@ -53,9 +53,10 @@ class Product:
             if isinstance(v, str) or isinstance(v, float) or isinstance(v, list):
                 return True
 
-    def check_product_existence(self, category, product_name, details):
+    def check_product_existence(self, category, product_name, details, quantity):
         """
-        This checks if the product already exists
+        This checks if the product already exists then updates its quantity
+        :param quantity:
         :param product_name:
         :param details:
         :param category:
@@ -63,6 +64,7 @@ class Product:
         """
         for product in self.stock[category]:
             if product_name == product["product_name"] and product["details"] == details:
+                product["quantity"] += quantity
                 return True
 
     def get_single_product(self, category, product_id):

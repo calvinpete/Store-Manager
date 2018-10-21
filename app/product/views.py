@@ -62,11 +62,11 @@ def add_product(current_user, category):
 
     try:
 
-        if not item.check_product_existence(category, product_name, details):
+        if not item.check_product_existence(category, product_name, details, quantity):
             item.add_product(category, product_name, quantity, details, price)
             return jsonify({"message": "Product successfully added"}), 201
         else:
-            return jsonify({"message": "{} {} already exists".format(details, product_name)}), 404
+            return jsonify({"message": "{} {}'s quantity has been updated".format(details, product_name)}), 200
 
     except KeyError:
         return jsonify({"message": "{} category does not exist".format(category)}), 404
