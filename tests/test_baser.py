@@ -71,7 +71,7 @@ class TestBase(unittest.TestCase):
         self.test_data44 = {"category": "Spices", "product_id": 100, "quantity": 12, "sale_type": "cash"}
         self.test_data44 = {"category": "Beverages", "product_id": 1, "quantity": 12, "sale_type": "cash"}
         self.user_account = Account()
-        self.test_user1 = {"username": "JohnP", "email_address": "JohnP@gmail.com", "password": "Hal0-pEt7&"}
+        self.test_user1 = {"name": "Robe", "email_address": "Robe@gmail.com", "password": "R&e"}
         self.test_user11 = {}
         self.test_user12 = {"name": 4, "email_address": "JohnP@gmail.com", "password": "Hal0-pEt7&"}
         self.test_user13 = {"name": 1.9, "email_address": "JohnP@gmail.com", "password": "Hal0-pEt7&"}
