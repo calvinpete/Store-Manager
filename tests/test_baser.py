@@ -66,8 +66,10 @@ class TestBase(unittest.TestCase):
         self.test_data29 = {"product_name": "Afia", "quantity": 12, "details": "300ml Orange", "price": 3500}
         self.test_data30 = {"product_name": "Ribena", "quantity": 12, "details": "250ml Black_current", "price": 1200}
         self.test_data300 = {"product_name": "Ribena", "quantity": 12}
-        self.test_data31 = {"category": "Drinks", "product_id": 1, "quantity": 9, "sale_type": "cash"}
+        self.test_data31 = {"category": "Juices", "product_id": 1, "quantity": 9, "sale_type": "cash"}
         self.test_data32 = {"category": "Spices", "product_id": 1, "quantity": 3, "sale_type": "credit"}
+        self.test_data320 = {"category": "Lights", "product_id": 1, "quantity": 3, "sale_type": "credit"}
+        self.test_data321 = {"category": "Detergents", "product_id": 1, "quantity": 3, "sale_type": "credit"}
         self.test_data33 = {}
         self.test_data34 = {"category": 100, "product_id": 1, "quantity": 9, "sale_type": "cash"}
         self.test_data35 = {"category": "Drinks", "product_id": 1, "quantity": 9, "sale_type": 67.6}
@@ -79,6 +81,8 @@ class TestBase(unittest.TestCase):
         self.test_data41 = {"category": "Drinks", "product_id": 1, "quantity": [9], "sale_type": "cash"}
         self.test_data42 = {"category": "Drinks", "product_id": 1, "quantity": 9.8, "sale_type": "cash"}
         self.test_data43 = {"category": "Drinks", "product_id": 1, "quantity": 12, "sale_type": "cash"}
+        self.test_data430 = {"category": "Drinks", "product_id": 1, "quantity": 120, "sale_type": "cash"}
+        self.test_data431 = {"category": "Drinks", "product_id": 1, "quantity": 0, "sale_type": "cash"}
         self.test_data44 = {"category": "Spices", "product_id": 100, "quantity": 12, "sale_type": "cash"}
         self.test_data44 = {"category": "Beverages", "product_id": 1, "quantity": 12, "sale_type": "cash"}
         self.user_account = Account()

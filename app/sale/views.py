@@ -24,10 +24,10 @@ def create_sale_record(current_user):
     if staff.check_input_type(
             category=category,
             sale_type=sale_type):
-        return jsonify({"message": "Please a enter a string"}), 400
+        return jsonify({"message": "Please enter a string"}), 400
 
     if item.check_product_input_type(product_id=product_id, quantity=quantity):
-        return jsonify({"message": "Please a enter an integer"}), 400
+        return jsonify({"message": "Please enter an integer"}), 400
 
     if staff.check_input_validity(
             category=category,
