@@ -64,18 +64,18 @@ nosetests --with-coverage --cover-package=app
 
 ### Features
 
-|               Endpoint                           |          Functionality      |
-| -------------------------------------------------|:---------------------------:|
-| POST /auth/signup                                | Create an admin account     |
-| POST /auth/login                                 | Login                       |
-| POST /category                                   | Create a category           |
-| POST /<category>/product                         | Add a product               |
-| POST /auth/register                              | Register a staff attendant  |
-| GET /<category>/product/productId                | Get a single product        |
-| GET /product                                     | Get all products            |
-| POST /sales                                      | Create a sale record        |
-| GET /sales/saleId                                | Get a single product        |
-| GET /sales                                       | Get all products            |
+|               Endpoint                                        |          Functionality      |
+| --------------------------------------------------------------|:---------------------------:|
+| POST /auth/signup                                             | Create an admin account     |
+| POST /auth/login                                              | Login                       |
+| POST /category                                                | Create a category           |
+| POST /category/product                                        | Add a product               |
+| POST /auth/register                                           | Register a staff attendant  |
+| GET /category/product/product_Id                              | Get a single product        |
+| GET /product                                                  | Get all products            |
+| POST /sales                                                   | Create a sale record        |
+| GET /sales/sale_Id                                            | Get a single product        |
+| GET /sales                                                    | Get all products            |
 
 
 
