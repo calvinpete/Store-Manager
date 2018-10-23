@@ -1,6 +1,6 @@
 
 
-[![Build Status](https://travis-ci.com/calvinpete/Store-Manager.svg?branch=develop)](https://travis-ci.com/calvinpete/Store-Manager)
+[![Build Status](https://travis-ci.org/calvinpete/Store-Manager.svg?branch=develop)](https://travis-ci.org/calvinpete/Store-Manager)    [![Coverage Status](https://coveralls.io/repos/github/calvinpete/Store-Manager/badge.svg?branch=develop)](https://coveralls.io/github/calvinpete/Store-Manager?branch=develop)      [![Maintainability](https://api.codeclimate.com/v1/badges/361fe7248d69425bf668/maintainability)](https://codeclimate.com/github/calvinpete/Store-Manager/maintainability)
 
 # Store Manager API Endpoints
 
