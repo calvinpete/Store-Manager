@@ -29,7 +29,6 @@ protobuf==3.0.0
 pycairo==1.16.2
 pycparser==2.19
 pycrypto==2.6.1
-pycups==1.9.73
 PyJWT==1.6.4
 pymacaroons==0.13.0
 PyNaCl==1.1.2
