@@ -15,17 +15,50 @@ To run the application, make sure you have the following installed on your local
 ```
 Git
 Python 3.6.3
-Flask
-JSON Web tokens
+pip
 Virtual Enviroment
 ```
 
-### Starting the application
+### Starting the application on Ubuntu
 
 Clone the project by running this in the terminal
 
 ```
-git clone https://github.com/calvinpete/Store-Manager/tree/develop
+git clone https://github.com/calvinpete/Store-Manager.git develop
+```
+
+Activate the virtualenv by running this command in the terminal
+
+```
+source venv/bin/activate
+```
+
+Install the packages.
+
+```
+pip3 install -r requirements.txt
+```
+
+Run the application in the terminal
+
+```
+python3 run.py
+```
+
+## Running the tests
+
+Run this command in the terminal
+
+```
+python3 -m unittest -v
+```
+
+### Starting the application on macOS
+
+Clone the project by running this in the terminal
+
+```
+git clone https://github.com/calvinpete/Store-Manager.git develop
 ```
 
 Activate the virtualenv by running this command in the terminal
@@ -43,7 +76,7 @@ pip install -r requirements.txt
 Run the application in the terminal
 
 ```
-python3 run.py
+python run.py
 ```
 
 ## Running the tests
@@ -51,8 +84,44 @@ python3 run.py
 Run this command in the terminal
 
 ```
-python3 -m unittest -v
+python -m unittest -v
 ```
+
+
+### Starting the application on Windows
+
+Clone the project by running this in the CMD
+
+```
+git clone https://github.com/calvinpete/Store-Manager.git develop
+```
+
+Activate the virtualenv by running this command in the CMD
+
+```
+source bin/activate
+```
+
+Install the packages.
+
+```
+python -m pip install -r requirements.txt
+```
+
+Run the application in the CMD
+
+```
+python run.py
+```
+
+## Running the tests
+
+Run this command in the CMD
+
+```
+python -m unittest -v
+```
+
 
 ### Running tests with coverage
 
@@ -83,10 +152,15 @@ nosetests --with-coverage --cover-package=app
 
 The app is deployed on this [link](https://store-manager17.herokuapp.com/)
 
+## API endpoints
+
+The endpoints can be tested using postman on this [link](https://www.getpostman.com/collections/35e40c8738ca0faf798e)
+
 ## Built With
 
 * [Python 3.6.3](https://www.python.org/) - General Purpose Language
 * [Flask](http://flask.pocoo.org/) - Python Micro Web Framework
+
 ## Authors
 
 Calvin Tinka
