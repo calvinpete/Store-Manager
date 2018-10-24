@@ -154,7 +154,7 @@ The app is deployed on this [link](https://store-manager17.herokuapp.com/)
 
 ## API endpoints
 
-The endpoints can be tested using postman on this [link](https://www.getpostman.com/collections/35e40c8738ca0faf798e)
+The endpoints can be tested using postman on this [link](https://documenter.getpostman.com/view/4977996/RWgxtF1s)
 
 ## Built With
 
