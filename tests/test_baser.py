@@ -1,15 +1,9 @@
 import unittest
 import json
-from instance.config import app_config
-from app.accounts import Account
-from app.products import Product
-from app.sales import Sales, item
-from app.account.views import *
-
-
-# from app.register.views import *
-# from app.sale import views
-# from app.product import views
+from app.api.v1.models.accounts import Account
+from app.api.v1.models.products import Product
+from app.api.v1.models.sales import Sales, item
+from app.api.v1 import *
 
 
 class TestBase(unittest.TestCase):

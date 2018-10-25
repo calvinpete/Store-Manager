@@ -2,8 +2,8 @@ import jwt
 import datetime
 from functools import wraps
 from flask import jsonify, request
-from app import app
-from app.accounts import staff
+from app.api.v1 import app
+from app.api.v1.models.accounts import staff
 from instance.config import Config
 
 

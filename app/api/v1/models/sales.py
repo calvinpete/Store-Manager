@@ -1,5 +1,5 @@
 import datetime
-from app.products import item
+from app.api.v1.models.products import item
 
 
 class Sales:

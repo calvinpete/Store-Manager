@@ -1,5 +1,5 @@
 import unittest
-from app.products import Product
+from app.api.v1.models.products import Product
 from tests.test_baser import TestBase
 
 

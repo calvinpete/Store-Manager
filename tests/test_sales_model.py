@@ -1,5 +1,5 @@
 import unittest
-from app.sales import Sales
+from app.api.v1.models.sales import Sales
 from tests.test_baser import TestBase
 
 

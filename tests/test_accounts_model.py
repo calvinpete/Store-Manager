@@ -1,5 +1,5 @@
 import unittest
-from app.accounts import Account
+from app.api.v1.models.accounts import Account
 from tests.test_baser import TestBase
 
 

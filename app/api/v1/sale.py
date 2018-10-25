@@ -1,9 +1,9 @@
 from flask import jsonify, request
-from app import app
-from app.accounts import staff
-from app.products import item
-from app.sales import staff_sales
-from app.account.views import token_required
+from app.api.v1 import app
+from app.api.v1.models.products import item
+from app.api.v1.models.accounts import staff
+from app.api.v1.models.sales import staff_sales
+from app.api.v1.account import token_required
 
 
 @app.route('/store-manager/api/v1/sales', methods=['POST'])
