@@ -61,7 +61,7 @@ def get_single_sale_record(current_user, sale_id):
         return jsonify(staff_sales.get_sale_record(staff.get_user_name(current_user), sale_id)), 200
 
     except IndexError:
-        return jsonify({"message": "Sale record does not exist"}), 201
+        return jsonify({"message": "Sale record does not exist"}), 404
 
 
 @app.route('/store-manager/api/v1/sales', methods=['GET'])

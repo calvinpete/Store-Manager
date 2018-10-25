@@ -268,6 +268,20 @@ class TestSalesApi(TestBase):
         response_message = json.loads(response.data.decode())
         self.assertIn("sale_id should be a positive integer", response_message["message"])
 
+    def test_non_existent_sale_record(self):
+        """This tests the get a single sale_record route for non_existent sale_record"""
+        self.app.post("/store-manager/api/v1/category", content_type="application/json",
+                      data=json.dumps(self.test_data01), headers={'x-access-token': self.token})
+        self.app.post('/store-manager/api/v1/Spices/products', content_type="application/json",
+                      data=json.dumps(self.test_data26), headers={'x-access-token': self.token})
+        self.app.post('/store-manager/api/v1/sales', content_type="application/json",
+                      data=json.dumps(self.test_data32), headers={'x-access-token': self.token_staff})
+        response = self.app.get('/store-manager/api/v1/sales/100', content_type="application/json",
+                                headers={'x-access-token': self.token_staff})
+        self.assertEqual(response.status_code, 404)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Sale record does not exist", response_message["message"])
+
 
 if __name__ == "__main__":
     unittest.main()
