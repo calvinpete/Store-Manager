@@ -25,6 +25,16 @@ class RegisterRoutesTestCase(TestBase):
         response_message = json.loads(response.data.decode())
         self.assertIn("Token is invalid", response_message["message"])
 
+    def test_wrong_user(self):
+        """
+        This tests a user without administrator rights
+        """
+        response = self.app.post("/store-manager/api/v1/register", content_type="application/json",
+                                 data=json.dumps(self.test_data29), headers={'x-access-token': self.token_staff})
+        self.assertEqual(response.status_code, 401)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("You do not have administrator access", response_message["message"])
+
     def test_unauthorized_register(self):
         """
         This tests the register route without a token
