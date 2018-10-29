@@ -27,13 +27,14 @@ class DatabaseConnection:
     def create_tables(self):
         """This creates a user table, product table and a sales table"""
         user_table = "CREATE TABLE users (user_id SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE NOT NULL, " \
-                     "email_address VARCHAR(255) UNIQUE NOT NULL, password VARCHAR(255) NOT NULL), " \
-                     "admin BOOLEAN NOT NULL;"
+                     "email_address VARCHAR(255) UNIQUE NOT NULL, password VARCHAR(255) NOT NULL, " \
+                     "admin BOOLEAN NOT NULL, Date_of_register TIMESTAMP NOT NULL);"
         self.cursor.execute(user_table)
         self.connection.commit()
 
         product_table = "CREATE TABLE product( product_id SERIAL PRIMARY KEY, product_name VARCHAR(255) NOT NULL, " \
-                        "details VARCHAR(255) NOT NULL, quantity NUMERIC NOT NULL, price NUMERIC NOT NULL);"
+                        "details VARCHAR(255) NOT NULL, quantity NUMERIC NOT NULL, price NUMERIC NOT NULL, " \
+                        "Last_Modified TIMESTAMP NOT NULL);"
         self.cursor.execute(product_table)
         self.connection.commit()
 
