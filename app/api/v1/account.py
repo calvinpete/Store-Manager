@@ -3,7 +3,8 @@ import datetime
 from functools import wraps
 from flask import jsonify, request
 from app.api.v1 import app
-from app.api.v1.models.accounts import staff
+from app.api.v1.models.accounts import Account
+from app.api.v1.validator import UserValidator
 from instance.config import Config
 
 
@@ -22,38 +23,6 @@ def method_not_allowed(error):
     return jsonify({"message": "This method is not allowed for the requested URL"}), 405
 
 
-@app.route('/store-manager/api/v1/auth/signup', methods=['POST'])
-def sign_up():
-    data = request.get_json()
-    if len(data.keys()) != 3:
-        return jsonify({"message": "please type in the missing fields"}), 400
-
-    name = data['name']
-    email_address = data['email_address']
-    password = data['password']
-
-    if staff.check_input_type(
-            name=name,
-            email_address=email_address,
-            password=password):
-        return jsonify({"message": "Please enter a string"}), 400
-
-    if staff.check_input_validity(
-            name=name,
-            email_address=email_address,
-            password=password):
-        return jsonify({"message": "Values are required"}), 400
-
-    if not staff.validate_email_address(email_address):
-        return jsonify({"message": "The email should follow the format of valid emails (johndoe@mail.com)"}), 400
-
-    if staff.check_user(email_address):
-        return jsonify({"message": "User already exists"}), 409
-    else:
-        staff.register(name, email_address, password, admin=True)
-        return jsonify({"message": "You've been successfully registered"}), 201
-
-
 @app.route('/store-manager/api/v1/auth/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -63,10 +32,12 @@ def login():
     email_address = data['email_address']
     password = data['password']
 
-    if not staff.check_user(email_address):
+    validate = UserValidator(email_address, password)
+
+    if Account.get_user_name(email_address) is None:
         return jsonify({"message": "User does not exist, please register"}), 400
 
-    if not staff.check_password(password):
+    if not validate.check_password():
         return jsonify({"message": "Invalid password, please try again"}), 400
     else:
         token = jwt.encode(
@@ -94,7 +65,7 @@ def token_required(f):
             return jsonify({"message": "Token is missing"}), 401
         try:
             data = jwt.decode(token, Config.SECRET_KEY)
-            current_user = staff.get_user(email_address=data["email_address"])
+            current_user = Account.get_user_email_address(email_address=data["email_address"])
         except:
             return jsonify({"message": "Token is invalid"}), 401
         return f(current_user, *args, **kwargs)
