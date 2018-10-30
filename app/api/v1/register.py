@@ -13,7 +13,7 @@ def register_staff(current_user):
         return jsonify({"message": "You do not have administrator access"}), 401
 
     data = request.get_json()
-    if len(data.keys()) != 3:
+    if len(data.keys()) != 4:
         return jsonify({"message": "please type in the missing fields"}), 400
 
     name = data['name']

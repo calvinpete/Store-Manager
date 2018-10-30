@@ -46,6 +46,23 @@ class DatabaseConnection:
         self.cursor.execute(sales_table)
         self.connection.commit()
 
+    def default_admin(self, *args):
+        """This method inserts an admin into the database"""
+        name = args[0]
+        email_address = args[1]
+        password = args[2]
+        account_type = args[3]
+        date_of_register = args[4]
+        select_users = "SELECT * FROM users;"
+        self.cursor.execute(select_users)
+        an_admin = self.cursor.fetchall()
+        if not an_admin:
+            insert_user = "INSERT INTO users(name, email_address, password, account_type, date_of_register) " \
+                          "VALUES('{}', '{}', '{}', '{}', '{}');".format(name, email_address, password, account_type,
+                                                                         date_of_register)
+            self.cursor.execute(insert_user, (name, email_address, password, account_type, date_of_register))
+            self.connection.commit()
+
     def insert_user(self, *args):
         """This method inserts a new user into the database"""
         name = args[0]
