@@ -42,8 +42,7 @@ class DatabaseConnection:
                       "user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE, " \
                       "store_attendant VARCHAR(255) UNIQUE NOT NULL, date_of_sale TIMESTAMP NOT NULL, " \
                       "product_id INT NOT NULL REFERENCES products(product_id) ON DELETE CASCADE, " \
-                      "quantity_sold NUMERIC NOT NULL, amount NUMERIC NOT NULL), " \
-                      "payment_mode VARCHAR(255) UNIQUE NOT NULL;"
+                      "quantity_sold NUMERIC NOT NULL, amount NUMERIC NOT NULL, payment_mode VARCHAR(255) NOT NULL);"
         self.cursor.execute(sales_table)
         self.connection.commit()
 

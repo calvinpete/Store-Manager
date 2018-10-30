@@ -14,19 +14,19 @@ class Sales:
         self.store_attendant = args[1]
         self.date_of_sale = datetime.datetime.utcnow()
         self.product_id = args[2]
-        self.quantity_sold = args[3]
+        self.quantity_to_be_sold = args[3]
         self.payment_mode = args[4]
 
     def check_available_product(self):
         """This checks if there is enough for sale"""
         product = db.select_one('products', 'product_id', self.product_id)
-        if 1 <= self.quantity_sold <= product[3]:
+        if 1 <= self.quantity_to_be_sold <= product[3]:
             return True
 
     def sale_product(self):
         """This creates a sale record after a product is sold"""
-        db.insert_sales(self.user_id, self.store_attendant, self.date_of_sale, self.product_id, self.quantity_sold,
-                        self.payment_mode)
+        db.insert_sales(self.user_id, self.store_attendant, self.date_of_sale, self.product_id,
+                        self.quantity_to_be_sold, self.payment_mode)
         sale_record = db.select_one('sales', 'user_id', self.user_id)
         return sale_record[2]
 
