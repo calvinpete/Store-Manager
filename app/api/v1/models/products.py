@@ -1,87 +1,82 @@
+import datetime
+from flask import jsonify
+from app.api.v1.database import DatabaseConnection
+
+
+db = DatabaseConnection()
+
+
 class Product:
     """This class holds the logic for managing inventory"""
-    def __init__(self):
-        self.stock = {}  # A data structure to hold available products
+    def __init__(self, product_name, quantity, details, price):
+        self.product_name = product_name
+        self.quantity = quantity
+        self.details = details
+        self.price = price
+        self.last_modified = datetime.datetime.utcnow()
 
-    def create_category(self, category):
-        """
-        This creates a list to hold products for that category
-        :param category:
-        :return:
-        """
-        self.stock[category] = []
+    # def create_category(self, category):
+    #     """
+    #     This creates a list to hold products for that category
+    #     :param category:
+    #     :return:
+    #     """
+    #     self.stock[category] = []
+    #
+    # def check_category(self, category):
+    #     """
+    #     This checks if the category exists
+    #     :param category:
+    #     :return:
+    #     """
+    #     for key in self.stock.keys():
+    #         if category == key:
+    #             return True
 
-    def check_category(self, category):
-        """
-        This checks if the category exists
-        :param category:
-        :return:
-        """
-        for key in self.stock.keys():
-            if category == key:
-                return True
+    def add_product(self):
+        """This adds a product to the inventory"""
+        db.insert_products(self.product_name, self.details, self.quantity, self.price, self.last_modified)
+        return self.product_name
 
-    def add_product(self, category, product_name, quantity, details, price):
-        """
-        This adds a product to the inventory
-        :param category:
-        :param product_name:
-        :param quantity:
-        :param details:
-        :param price:
-        :return:
-        """
-        product_id = len(self.stock[category]) + 1
-        product = {
-            "product_id": product_id,
-            "product_name": product_name,
-            "details": details,
-            "quantity": quantity,
-            "price": price
-        }
-        self.stock[category].append(product)
-        return self.stock
+    def check_product_existence(self):
+        """This checks if the product already exists then updates its quantity"""
+        product = db.select_one_product('products', 'product_name', self.product_name, 'details', self.details)
+        if product is not None:
+            db.update_product_quantity('product_name', self.product_name, 'details', self.details, product[3],
+                                       self.quantity)
+            return True
 
     @staticmethod
-    def check_product_input_type(**kwargs):
-        """
-        This checks if the product_id, quantity and price are not integers
-        :param kwargs:
-        :return:
-        """
-        for (k, v) in kwargs.items():
-            if isinstance(v, str) or isinstance(v, float) or isinstance(v, list):
-                return True
+    def get_single_product(product_id):
+        """This fetches a single product"""
+        product = db.select_one('products', 'product_id', product_id)
+        if product:
+            return jsonify(
+                {
+                    'product_id': product[0],
+                    'product_name': product[1],
+                    'details': product[2],
+                    'quantity': product[3],
+                    'price': product[4],
+                    'Last Modified': product[5]
+                }
+            ), 200
+        else:
+            return jsonify({"message": "Product does not exist"}), 404
 
-    def check_product_existence(self, category, product_name, details, quantity):
-        """
-        This checks if the product already exists then updates its quantity
-        :param quantity:
-        :param product_name:
-        :param details:
-        :param category:
-        :return:
-        """
-        for product in self.stock[category]:
-            if product_name == product["product_name"] and product["details"] == details:
-                product["quantity"] += quantity
-                return True
-
-    def get_single_product(self, category, product_id):
-        """
-        This fetches a single product
-        :param category:
-        :param product_id:
-        :return:
-        """
-        return self.stock[category][int(product_id) - 1]
-
-    def get_all_products(self):
-        """
-        This fetches all available products
-        :return:
-        """
-        return self.stock
-
-
-item = Product()
+    @staticmethod
+    def get_all_products():
+        """This fetches all available products"""
+        all_products = db.select_all('products')
+        inventory = []
+        for product in all_products:
+            single_item = {
+                'product_id': product[0],
+                'product_name': product[1],
+                'details': product[2],
+                'quantity': product[3],
+                'price': product[4],
+                'Last Modified': product[5]
+            }
+            inventory.append(single_item)
+        return inventory
