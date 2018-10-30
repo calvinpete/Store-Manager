@@ -1,75 +1,75 @@
 import datetime
-from app.api.v1.models.products import item
+from flask import jsonify
+from app.api.v1.database import DatabaseConnection
+
+
+db = DatabaseConnection()
 
 
 class Sales:
     """This class holds the logic for managing sale"""
 
-    def __init__(self):
-        self.sales_records = {}  # A data structure for holding sale records
+    def __init__(self, *args):
+        self.user_id = args[0]
+        self.store_attendant = args[1]
+        self.date_of_sale = datetime.datetime.utcnow()
+        self.product_id = args[2]
+        self.quantity_sold = args[3]
+        self.payment_mode = args[4]
 
-    @staticmethod
-    def check_available_product(category, pdt_id, qty):
-        """
-        This checks if there is enough for sale
-        :param category:
-        :param qty:
-        :param pdt_id:
-        :return:
-        """
-        pdt = item.stock[category][int(pdt_id) - 1]
-        if int(pdt["quantity"]) >= int(qty) >= 1:
+    def check_available_product(self):
+        """This checks if there is enough for sale"""
+        product = db.select_one('products', 'product_id', self.product_id)
+        if 1 <= self.quantity_sold <= product[3]:
             return True
 
-    def sale_product(self, category, pdt_id, qty, sale_type, name):
-        """
-        This creates a sale record after a product is sold
-        :param category:
-        :param sale_type:
-        :param name:
-        :param pdt_id:
-        :param qty:
-        :return:
-        """
-        pdt = item.stock[category][int(pdt_id)-1]
-        pdt["quantity"] = int(pdt["quantity"]) - int(qty)
-        sale_record = {
-            "date of sale": str(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")),
-            "product_id": pdt_id,
-            "product_name": pdt["product_name"],
-            "category": category,
-            "details": pdt["details"],
-            "quantity_sold": qty,
-            "amount": int(qty) * int(pdt["price"]),
-            "sale_type": sale_type
-        }
+    def sale_product(self):
+        """This creates a sale record after a product is sold"""
+        db.insert_sales(self.user_id, self.store_attendant, self.date_of_sale, self.product_id, self.quantity_sold,
+                        self.payment_mode)
+        sale_record = db.select_one('sales', 'user_id', self.user_id)
+        return sale_record[2]
 
-        for key in self.sales_records.keys():
-            if name == key:
-                self.sales_records[name].append(sale_record)
-                sale_record.update(record_id=len(self.sales_records[name]))  # sale record identification
-                return self.sales_records
-        else:
-            self.sales_records[name] = []  # A list to hold sale records for a single staff attendant
-            self.sales_records[name].append(sale_record)
-            sale_record.update(record_id=len(self.sales_records[name]))
-            return self.sales_records
-
-    def get_sale_record(self, name, record_id):
+    def get_sale_record(self, record_id):
         """
         This fetches a sale record
-        :param name:
-        :param record_id:
-        :return:
         """
-        return self.sales_records[name][int(record_id) - 1]
+        sale_record = db.select_one('sales', 'record_id', record_id)
+        product = db.select_one('products', 'product_id', self.product_id)
+        if sale_record:
+            return jsonify(
+                {
+                    'record_id': sale_record[0],
+                    'date of sale': sale_record[3],
+                    'store_attendant': sale_record[2],
+                    'product_name': product[1],
+                    'details': product[2],
+                    'quantity_sold': sale_record[5],
+                    'amount': sale_record[6],
+                    'payment_method': sale_record[7]
+                }
+            ), 200
+        else:
+            return jsonify({"message": "Sale record does not exist"}), 404
 
     def get_all_sales(self):
         """
         This fetches all sale record
         :return:
         """
-        return self.sales_records
-
-
-staff_sales = Sales()
+        all_sales = db.select_all('sales')
+        product = db.select_one('products', 'product_id', self.product_id)
+        sales_book = []
+        for sale in all_sales:
+            single_item = {
+                'record_id': sale[0],
+                'date of sale': sale[3],
+                'store_attendant': sale[2],
+                'product_name': product[1],
+                'details': product[2],
+                'quantity_sold': sale[5],
+                'amount': sale[6],
+                'payment_method': sale[7]
+            }
+            sales_book.append(single_item)
+        return sales_book

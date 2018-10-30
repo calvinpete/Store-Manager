@@ -40,9 +40,10 @@ class DatabaseConnection:
 
         sales_table = "CREATE TABLE IF NOT EXISTS sales (record_id SERIAL PRIMARY KEY, " \
                       "user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE, " \
-                      "date_of_sale TIMESTAMP NOT NULL, " \
+                      "store_attendant VARCHAR(255) UNIQUE NOT NULL, date_of_sale TIMESTAMP NOT NULL, " \
                       "product_id INT NOT NULL REFERENCES products(product_id) ON DELETE CASCADE, " \
-                      "quantity_sold NUMERIC NOT NULL, amount NUMERIC NOT NULL);"
+                      "quantity_sold NUMERIC NOT NULL, amount NUMERIC NOT NULL), " \
+                      "payment_mode VARCHAR(255) UNIQUE NOT NULL;"
         self.cursor.execute(sales_table)
         self.connection.commit()
 
@@ -92,12 +93,16 @@ class DatabaseConnection:
     def insert_sales(self, *args):
         """This method inserts a sale record into the database"""
         user_id = args[0]
-        date_of_sale = args[1]
-        product_id = args[2]
-        quantity_sold = args[3]
-        insert_sales = "INSERT INTO sales(user_id, date_of_sale, product_id, quantity_sold) " \
-                       "VALUES('{}', '{}', '{}', '{}');".format(user_id, date_of_sale, product_id, quantity_sold)
-        self.cursor.execute(insert_sales, (user_id, date_of_sale, product_id, quantity_sold))
+        store_attendant = args[1]
+        date_of_sale = args[2]
+        product_id = args[3]
+        quantity_sold = args[4]
+        payment_mode = args[5]
+        insert_sales = "INSERT INTO sales(user_id, store_attendant, date_of_sale, product_id, quantity_sold, " \
+                       "payment_mode) VALUES('{}', '{}', '{}', '{}', '{}', '{}');"\
+            .format(user_id, store_attendant, date_of_sale, product_id, quantity_sold, payment_mode)
+        self.cursor.execute(insert_sales, (user_id, store_attendant, date_of_sale, product_id, quantity_sold,
+                                           payment_mode))
         self.connection.commit()
 
     def select_all(self, table):
