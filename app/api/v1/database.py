@@ -129,9 +129,11 @@ class DatabaseConnection:
         value_2 = args[3]
         old_quantity = args[4]
         new_quantity = args[5]
-        update_row = "UPDATE products SET quantity = {} + {} WHERE {}='{}' AND {}='{}';"\
-            .format(old_quantity, new_quantity, column_1, value_1, column_2, value_2)
+        value_3 = args[6]
+        update_row = "UPDATE products SET quantity = {} + {}, Last_Modified = '{}' WHERE {}='{}' AND {}='{}';"\
+            .format(old_quantity, new_quantity, value_3, column_1, value_1, column_2, value_2)
         self.cursor.execute(update_row)
+        self.connection.commit()
 
     def select_all_sales(self):
         """

@@ -43,7 +43,7 @@ class Product:
         product = db.select_one_product('products', 'product_name', self.product_name, 'details', self.details)
         if product is not None:
             db.update_product_quantity('product_name', self.product_name, 'details', self.details, product[3],
-                                       self.quantity)
+                                       self.quantity, self.last_modified)
             return True
 
     @staticmethod
