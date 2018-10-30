@@ -121,6 +121,18 @@ class DatabaseConnection:
         row = self.cursor.fetchone()
         return row
 
+    def update_product_quantity(self, *args):
+        """This method selects one row in a table given the column then modifies the column value"""
+        column_1 = args[0]
+        value_1 = args[1]
+        column_2 = args[2]
+        value_2 = args[3]
+        old_quantity = args[4]
+        new_quantity = args[5]
+        update_row = "UPDATE products SET quantity = {} + {} WHERE {}='{}' AND {}='{}';"\
+            .format(old_quantity, new_quantity, column_1, value_1, column_2, value_2)
+        self.cursor.execute(update_row)
+
     def select_all_sales(self):
         """
         This method selects all rows of the sales table together with:
