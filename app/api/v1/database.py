@@ -46,7 +46,7 @@ class DatabaseConnection:
         self.cursor.execute(sales_table)
         self.connection.commit()
 
-    def default_admin(self, *args):
+    def default_admin_setup(self, *args):
         """This method inserts an admin into the database"""
         name = args[0]
         email_address = args[1]
@@ -110,6 +110,13 @@ class DatabaseConnection:
     def select_one(self, table, column, value):
         """This method selects one row in a table given the column matches a specific value"""
         select_row = "SELECT * FROM {} WHERE {}='{}';".format(table, column, value)
+        self.cursor.execute(select_row)
+        row = self.cursor.fetchone()
+        return row
+
+    def select_one_product(self, table, column_1, value_1, column_2, value_2):
+        """This method selects one row in a table given the column matches a specific value"""
+        select_row = "SELECT * FROM {} WHERE {}='{}' AND {}='{}';".format(table, column_1, value_1, column_2, value_2)
         self.cursor.execute(select_row)
         row = self.cursor.fetchone()
         return row
