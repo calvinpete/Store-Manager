@@ -44,6 +44,12 @@ class Account:
         user = db.select_one('users', 'email_address', email_address)  # selects a specific row of the users table
         return user[1]  # picks the value in the 1st column of that row
 
+    @staticmethod
+    def get_user_id(email_address):
+        """This fetches the user's name"""
+        user = db.select_one('users', 'email_address', email_address)  # selects a specific row of the users table
+        return user[0]  # picks the value in the 1st column of that row
+
     # def promote_user(self, user_id):
     #     """
     #     This gives admin rights to a user
