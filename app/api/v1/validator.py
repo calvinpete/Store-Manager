@@ -47,19 +47,20 @@ class UserValidator:
             if isinstance(v, int) or isinstance(v, float) or isinstance(v, list):
                 return True
 
+    @staticmethod
+    def check_integer_input(**kwargs):
+        """
+        This checks if the parameters are not integers
+        :param kwargs:
+        :return:
+        """
+        for (k, v) in kwargs.items():
+            if isinstance(v, str) or isinstance(v, float) or isinstance(v, list):
+                return True
+
     class ProductValidator:
         """This holds methods for handling attribute validation and input validations"""
-
-        @staticmethod
-        def check_integer_input(**kwargs):
-            """
-            This checks if the parameters are not integers
-            :param kwargs:
-            :return:
-            """
-            for (k, v) in kwargs.items():
-                if isinstance(v, str) or isinstance(v, float) or isinstance(v, list):
-                    return True
+        pass
 
     class SaleRecordValidator:
         pass
