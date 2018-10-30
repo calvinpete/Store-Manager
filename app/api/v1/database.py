@@ -1,5 +1,5 @@
 import psycopg2
-from instance.config import app_config
+from flask import current_app as app
 
 
 class DatabaseConnection:
@@ -9,53 +9,54 @@ class DatabaseConnection:
         self.connection = psycopg2.connect(
             database="storemanager", user="calvin", password="310892", host="127.0.0.1", port="5432"
         )
-        self.connection.autocommit = True
-        self.cursor = self.connection.cursor()
-        print("Successfully connected to the database")
+
         try:
-            if app_config["testing"]:
+            if app.config['TESTING']:
                 self.connection = psycopg2.connect(
                     database="storemanagertestdb", user="calvin", password="310892", host="127.0.0.1", port="5432"
                 )
-                self.connection.autocommit = True
-                self.cursor = self.connection.cursor()
 
         except Exception as e:
             print(e)
-            print("No connection to the database")
+
+        # for connecting to the database
+        self.cursor = self.connection.cursor()
+        print("Database successfully connected")
 
     def create_tables(self):
         """This creates a user table, product table and a sales table"""
-        user_table = "CREATE TABLE users (user_id SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE NOT NULL, " \
-                     "email_address VARCHAR(255) UNIQUE NOT NULL, password VARCHAR(255) NOT NULL, " \
-                     "admin BOOLEAN NOT NULL DEFAULT FALSE, Date_of_register TIMESTAMP NOT NULL);"
+        user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
+                     "name VARCHAR(255) UNIQUE NOT NULL, email_address VARCHAR(255) UNIQUE NOT NULL, " \
+                     "password VARCHAR(255) NOT NULL, account_type VARCHAR(255) NOT NULL, " \
+                     "Date_of_register TIMESTAMP NOT NULL);"
         self.cursor.execute(user_table)
         self.connection.commit()
 
-        product_table = "CREATE TABLE products( product_id SERIAL PRIMARY KEY, product_name VARCHAR(255) NOT NULL, " \
-                        "details VARCHAR(255) NOT NULL, quantity NUMERIC NOT NULL, price NUMERIC NOT NULL, " \
-                        "Last_Modified TIMESTAMP NOT NULL);"
+        product_table = "CREATE TABLE IF NOT EXISTS products( product_id SERIAL PRIMARY KEY, " \
+                        "product_name VARCHAR(255) NOT NULL, details VARCHAR(255) NOT NULL, " \
+                        "quantity NUMERIC NOT NULL, price NUMERIC NOT NULL, Last_Modified TIMESTAMP NOT NULL);"
         self.cursor.execute(product_table)
         self.connection.commit()
 
-        sales_table = "CREATE TABLE sales (record_id SERIAL PRIMARY KEY, date_of_sale TIMESTAMP NOT NULL, " \
-                      "product_id INT NOT NULL REFERENCES product(product_id), " \
-                      "product_name VARCHAR(255) NOT NULL REFERENCES product(product_name), " \
-                      "details VARCHAR(255) NOT NULL REFERENCES product(details), quantity_sold NUMERIC NOT NULL, " \
-                      "amount NUMERIC NOT NULL);"
+        sales_table = "CREATE TABLE IF NOT EXISTS sales (record_id SERIAL PRIMARY KEY, " \
+                      "user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE, " \
+                      "date_of_sale TIMESTAMP NOT NULL, " \
+                      "product_id INT NOT NULL REFERENCES products(product_id) ON DELETE CASCADE, " \
+                      "quantity_sold NUMERIC NOT NULL, amount NUMERIC NOT NULL);"
         self.cursor.execute(sales_table)
         self.connection.commit()
 
-    def insert_users(self, *args):
+    def insert_user(self, *args):
         """This method inserts a new user into the database"""
         name = args[0]
         email_address = args[1]
         password = args[2]
-        admin = args[3]
+        account_type = args[3]
         date_of_register = args[4]
-        insert_user = "INSERT INTO users(name, email_address, password, admin, date_of_register) " \
-                      "VALUES({}, {}, {}, {});".format(name, email_address, password, admin, date_of_register)
-        self.cursor.execute(insert_user, (name, email_address, password, admin, date_of_register))
+        insert_user = "INSERT INTO users(name, email_address, password, account_type, date_of_register) " \
+                      "VALUES('{}', '{}', '{}', '{}', '{}');".format(name, email_address, password, account_type,
+                                                                     date_of_register)
+        self.cursor.execute(insert_user, (name, email_address, password, account_type, date_of_register))
         self.connection.commit()
 
     def insert_products(self, *args):
@@ -66,24 +67,66 @@ class DatabaseConnection:
         price = args[3]
         last_modified = args[4]
         insert_product = "INSERT INTO products(product_name, details, quantity, price, last_modified) " \
-                         "VALUES({}, {}, {}, {});".format(product_name, details, quantity, price, last_modified)
+                         "VALUES('{}', '{}', '{}', '{}', '{}');".format(product_name, details, quantity, price,
+                                                                        last_modified)
         self.cursor.execute(insert_product, (product_name, details, quantity, price, last_modified))
         self.connection.commit()
 
     def insert_sales(self, *args):
         """This method inserts a sale record into the database"""
-        date_of_sale = args[0]
-        product_id = args[1]
-        product_name = args[2]
-        details = args[3]
-        quantity_sold = args[4]
-        amount = args[5]
-        insert_sales = "INSERT INTO sales(date_of_sale, product_id, product_name, details, quantity_sold, amount) " \
-                       "VALUES({}, {}, {}, {});".format(date_of_sale, product_id, product_name, details, quantity_sold,
-                                                        amount)
-        self.cursor.execute(insert_sales, (date_of_sale, product_id, product_name, details, quantity_sold, amount))
+        user_id = args[0]
+        date_of_sale = args[1]
+        product_id = args[2]
+        quantity_sold = args[3]
+        insert_sales = "INSERT INTO sales(user_id, date_of_sale, product_id, quantity_sold) " \
+                       "VALUES('{}', '{}', '{}', '{}');".format(user_id, date_of_sale, product_id, quantity_sold)
+        self.cursor.execute(insert_sales, (user_id, date_of_sale, product_id, quantity_sold))
         self.connection.commit()
 
+    def select_all(self, table):
+        """This method selects all rows in a table"""
+        select_table = "SELECT * FROM {};".format(table)
+        self.cursor.execute(select_table)
+        rows = self.cursor.fetchall()
+        return rows
 
-if __name__ == "__main__":
-    database = DatabaseConnection()
+    def select_one(self, table, column, value):
+        """This method selects one row in a table given the column matches a specific value"""
+        select_row = "SELECT * FROM {} WHERE {}='{}';".format(table, column, value)
+        self.cursor.execute(select_row)
+        row = self.cursor.fetchone()
+        return row
+
+    def select_all_sales(self):
+        """
+        This method selects all rows of the sales table together with:
+        - Two columns of the products table
+        - One column of the users table
+        """
+        select_sales = "SELECT sales.user_id, sales.date_of_sale, sales.product_id, sales.quantity_sold, " \
+                       "products.product_name, products.details, users.name FROM sales " \
+                       "INNER JOIN products ON products.product_id = sales.product_id " \
+                       "INNER JOIN users ON users.user_id = sales.user_id ORDER BY sales.date_of_sale;"
+        self.cursor.execute(select_sales)
+        rows = self.cursor.fetchall()
+        return rows
+
+    def select_one_sale(self, record_id):
+        """
+        This method selects one row of the sales table together with:
+        - Two columns of the products table
+        - One column of the users table
+        """
+        select_sale = "SELECT sales.user_id, sales.date_of_sale, sales.product_id, sales.quantity_sold, " \
+                      "products.product_name, products.details, users.name FROM sales " \
+                      "INNER JOIN products ON products.product_id = sales.product_id " \
+                      "INNER JOIN users ON users.user_id = sales.user_id " \
+                      "WHERE sales.record_id = '{}';".format(record_id)
+        self.cursor.execute(select_sale, [record_id])
+        row = self.cursor.fetchall()
+        return row
+
+    def drop_tables(self, table):
+        """This method drops a table"""
+        drop_table = "DROP TABLE IF EXISTS {} CASCADE".format(table)
+        self.cursor.execute(drop_table)
