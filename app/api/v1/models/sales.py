@@ -30,46 +30,58 @@ class Sales:
         sale_record = db.select_one('sales', 'user_id', self.user_id)
         return sale_record[2]
 
-    def get_sale_record(self, record_id):
+    @staticmethod
+    def get_sale_record(record_id):
         """
         This fetches a sale record
         """
-        sale_record = db.select_one('sales', 'record_id', record_id)
-        product = db.select_one('products', 'product_id', self.product_id)
+        sale_record = db.select_one_sale(record_id)
+        products_sold = []
+        grand_total = 0
         if sale_record:
+            for column in sale_record:
+                products_sold.append(
+                    {
+                        'product_id': column[2],
+                        'product_name': column[6],
+                        'details': column[7],
+                        'quantity_sold': column[3],
+                        'total_cost': column[4]
+                    }
+                )
+                grand_total += column[4]
             return jsonify(
                 {
-                    'record_id': sale_record[0],
-                    'date of sale': sale_record[3],
-                    'store_attendant': sale_record[2],
-                    'product_name': product[1],
-                    'details': product[2],
-                    'quantity_sold': sale_record[5],
-                    'amount': sale_record[6],
-                    'payment_method': sale_record[7]
+                    'record_id': record_id,
+                    'date of sale': sale_record[1],
+                    'user_id': sale_record[0],
+                    'store_attendant': sale_record[8],
+                    'products_sold': products_sold,
+                    'grand_total': grand_total,
+                    'payment_mode': sale_record[5]
                 }
             ), 200
         else:
             return jsonify({"message": "Sale record does not exist"}), 404
 
-    def get_all_sales(self):
+    @staticmethod
+    def get_all_sales():
         """
         This fetches all sale record
         :return:
         """
-        all_sales = db.select_all('sales')
-        product = db.select_one('products', 'product_id', self.product_id)
-        sales_book = []
+        all_sales = db.select_all_sales()
+        sales_book = {}
         for sale in all_sales:
-            single_item = {
+            sales_book[sale[9]] = {
                 'record_id': sale[0],
-                'date of sale': sale[3],
-                'store_attendant': sale[2],
-                'product_name': product[1],
-                'details': product[2],
-                'quantity_sold': sale[5],
-                'amount': sale[6],
-                'payment_method': sale[7]
+                'user_id': sale[1],
+                'date of sale': sale[2],
+                'product_id': sale[3],
+                'product_name': sale[7],
+                'details': sale[8],
+                'quantity_sold': sale[4],
+                'total_cost': sale[5],
+                'payment_method': sale[6]
             }
-            sales_book.append(single_item)
         return sales_book

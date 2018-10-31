@@ -42,7 +42,8 @@ class DatabaseConnection:
                       "user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE, " \
                       "store_attendant VARCHAR(255) UNIQUE NOT NULL, date_of_sale TIMESTAMP NOT NULL, " \
                       "product_id INT NOT NULL REFERENCES products(product_id) ON DELETE CASCADE, " \
-                      "quantity_sold NUMERIC NOT NULL, amount NUMERIC NOT NULL, payment_mode VARCHAR(255) NOT NULL);"
+                      "quantity_sold NUMERIC NOT NULL, total_cost NUMERIC NOT NULL, " \
+                      "payment_mode VARCHAR(255) NOT NULL);"
         self.cursor.execute(sales_table)
         self.connection.commit()
 
@@ -96,10 +97,11 @@ class DatabaseConnection:
         date_of_sale = args[2]
         product_id = args[3]
         quantity_sold = args[4]
+        total_cost = self.select_one('products.price', 'product_id', product_id)[4]
         payment_mode = args[5]
         insert_sales = "INSERT INTO sales(user_id, store_attendant, date_of_sale, product_id, quantity_sold, " \
-                       "payment_mode) VALUES('{}', '{}', '{}', '{}', '{}', '{}');"\
-            .format(user_id, store_attendant, date_of_sale, product_id, quantity_sold, payment_mode)
+                       "total_cost, payment_mode) VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}');"\
+            .format(user_id, store_attendant, date_of_sale, product_id, quantity_sold, total_cost, payment_mode)
         self.cursor.execute(insert_sales, (user_id, store_attendant, date_of_sale, product_id, quantity_sold,
                                            payment_mode))
         self.connection.commit()
@@ -145,8 +147,9 @@ class DatabaseConnection:
         - Two columns of the products table
         - One column of the users table
         """
-        select_sales = "SELECT sales.user_id, sales.date_of_sale, sales.product_id, sales.quantity_sold, " \
-                       "products.product_name, products.details, users.name FROM sales " \
+        select_sales = "SELECT sales.record_id, sales.user_id, sales.date_of_sale, sales.product_id, " \
+                       "sales.quantity_sold, sales.total_cost, sales.payment_mode, products.product_name, " \
+                       "products.details, users.name FROM sales " \
                        "INNER JOIN products ON products.product_id = sales.product_id " \
                        "INNER JOIN users ON users.user_id = sales.user_id ORDER BY sales.date_of_sale;"
         self.cursor.execute(select_sales)
@@ -160,8 +163,8 @@ class DatabaseConnection:
         - One column of the users table
         """
         select_sale = "SELECT sales.user_id, sales.date_of_sale, sales.product_id, sales.quantity_sold, " \
-                      "products.product_name, products.details, users.name FROM sales " \
-                      "INNER JOIN products ON products.product_id = sales.product_id " \
+                      "sales.total_cost, sales.payment_mode, products.product_name, products.details, " \
+                      "users.name FROM sales INNER JOIN products ON products.product_id = sales.product_id " \
                       "INNER JOIN users ON users.user_id = sales.user_id " \
                       "WHERE sales.record_id = '{}';".format(record_id)
         self.cursor.execute(select_sale, [record_id])
