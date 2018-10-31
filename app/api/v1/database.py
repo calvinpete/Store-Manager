@@ -171,6 +171,20 @@ class DatabaseConnection:
         row = self.cursor.fetchall()
         return row
 
+    def update_product(self, *args):
+        """This method selects one row in the products table modifies all the column values"""
+        product_name = args[0]
+        details = args[1]
+        quantity = args[2]
+        price = args[3]
+        last_modified = args[4]
+        product_id = args[5]
+        update_row = "UPDATE product_name = '{}', details = '{}', quantity = '{}', price = '{}', " \
+                     "last_modified = '{}' WHERE product_id = '{}';"\
+            .format(product_name, details, quantity, price, last_modified, product_id)
+        self.cursor.execute(update_row, (product_name, details, quantity, price, last_modified, product_id))
+        self.connection.commit()
+
     def drop_tables(self, table):
         """This method drops a table"""
         drop_table = "DROP TABLE IF EXISTS {} CASCADE".format(table)
