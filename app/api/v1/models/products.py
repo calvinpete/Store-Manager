@@ -32,7 +32,13 @@ class Product:
 
     def modify_product(self, product_id):
         """This edits a single product's information"""
-        db.update_product(self.product_name, self.details, self.quantity, self.price, self.created_on, product_id)
+        product = db.select_one('products', 'product_id', product_id)
+        if product:
+            db.update_product(self.product_name, self.details, self.quantity, self.price, self.last_modified,
+                              product_id)
+            return jsonify({"message": "Product successfully modified"}), 200
+        else:
+            return jsonify({"message": "Product does not exist"}), 404
 
     @staticmethod
     def get_single_product(product_id):
@@ -76,7 +82,7 @@ class Product:
         """This removes a product from the inventory"""
         product = db.select_one('products', 'product_id', product_id)
         if product:
-            db.delete_product(product_id)
+            db.delete_product(datetime.datetime.utcnow(), product_id)
             return jsonify({
                 "message": "{} of {} successfully removed from the inventory".format(product[1], product[2])
             }), 200

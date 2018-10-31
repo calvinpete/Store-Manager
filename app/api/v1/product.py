@@ -121,11 +121,7 @@ def modify_product(current_user, product_id):
 
         item = Product(product_name, quantity, details, price)
 
-        if db.select_one('products', 'product_id', product_id) is not None:
-            return jsonify({"message": "Product does not exist"}), 404
-
-        item.modify_product(product_id)
-        return jsonify({"message": "Product successfully modified"}), 200
+        return item.modify_product(product_id)
 
     except KeyError:
         return jsonify({"message": "You should have the product_name, quantity, details and price fields"}), 400

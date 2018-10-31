@@ -28,14 +28,15 @@ class DatabaseConnection:
         user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
                      "name VARCHAR(255) NOT NULL, email_address VARCHAR(255) UNIQUE NOT NULL, " \
                      "password VARCHAR(255) NOT NULL, account_type VARCHAR(255) NOT NULL, " \
-                     "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL);"
+                     "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
+                     "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
         self.cursor.execute(user_table)
         self.connection.commit()
 
         product_table = "CREATE TABLE IF NOT EXISTS products( product_id SERIAL PRIMARY KEY, " \
                         "product_name VARCHAR(255) NOT NULL, details VARCHAR(255) NOT NULL, " \
                         "quantity NUMERIC NOT NULL, price NUMERIC NOT NULL, created_on TIMESTAMP NOT NULL, " \
-                        "last_modified TIMESTAMP NOT NULL);"
+                        "last_modified TIMESTAMP NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
         self.cursor.execute(product_table)
         self.connection.commit()
 
@@ -44,7 +45,7 @@ class DatabaseConnection:
                       "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL," \
                       "product_id INT NOT NULL REFERENCES products(product_id), " \
                       "quantity_sold NUMERIC NOT NULL, total_cost NUMERIC NOT NULL, " \
-                      "payment_mode VARCHAR(255) NOT NULL);"
+                      "payment_mode VARCHAR(255) NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
         self.cursor.execute(sales_table)
         self.connection.commit()
 
@@ -115,14 +116,14 @@ class DatabaseConnection:
 
     def select_all(self, table):
         """This method selects all rows in a table"""
-        select_table = "SELECT * FROM {};".format(table)
+        select_table = "SELECT * FROM {} WHERE delete_status = FALSE;".format(table)
         self.cursor.execute(select_table)
         rows = self.cursor.fetchall()
         return rows
 
     def select_one(self, table, column, value):
         """This method selects one row in a table given the column matches a specific value"""
-        select_row = "SELECT * FROM {} WHERE {}='{}';".format(table, column, value)
+        select_row = "SELECT * FROM {} WHERE {}='{}' AND delete_status = FALSE;".format(table, column, value)
         self.cursor.execute(select_row)
         row = self.cursor.fetchone()
         return row
@@ -186,16 +187,17 @@ class DatabaseConnection:
         price = args[3]
         last_modified = args[4]
         product_id = args[5]
-        update_row = "UPDATE product_name = '{}', details = '{}', quantity = '{}', price = '{}', " \
+        update_row = "UPDATE products SET product_name = '{}', details = '{}', quantity = '{}', price = '{}', " \
                      "last_modified = '{}' WHERE product_id = '{}';"\
             .format(product_name, details, quantity, price, last_modified, product_id)
         self.cursor.execute(update_row, (product_name, details, quantity, price, last_modified, product_id))
         self.connection.commit()
 
-    def delete_product(self, product_id):
+    def delete_product(self, last_modified, product_id):
         """This method selects one row in the products table then deletes it"""
-        delete_row = "DELETE FROM products WHERE 'product_id' = {}".format(product_id)
-        self.cursor.execute(delete_row, [product_id])
+        delete_row = "UPDATE products SET delete_status = TRUE, last_modified = '{}' WHERE product_id = '{}';"\
+            .format(last_modified, product_id)
+        self.cursor.execute(delete_row, (last_modified, product_id))
         self.connection.commit()
 
     def drop_tables(self, table):
