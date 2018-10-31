@@ -84,9 +84,6 @@ def get_all_products(current_user):
 @token_required
 def get_single_product(current_user, product_id):
 
-    # if int(product_id) <= 0:
-    #     return jsonify({"message": "Product_id should be a positive integer"}), 404
-
     return Product.get_single_product(product_id)
 
 
@@ -129,4 +126,11 @@ def modify_product(current_user, product_id):
     return jsonify({"message": "Product successfully modified"}), 200
 
 
+@app.route('/store-manager/api/v1/products/<product_id>', methods=['DELETE'])
+@token_required
+def delete_product(current_user, product_id):
 
+    if Account.check_admin(current_user) != 'admin':
+        return jsonify({"message": "You do not have administrator access"}), 401
+
+    return Product.delete_product(product_id)
