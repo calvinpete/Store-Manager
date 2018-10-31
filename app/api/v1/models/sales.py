@@ -11,11 +11,11 @@ class Sales:
 
     def __init__(self, *args):
         self.user_id = args[0]
-        self.store_attendant = args[1]
-        self.date_of_sale = datetime.datetime.utcnow()
-        self.product_id = args[2]
-        self.quantity_to_be_sold = args[3]
-        self.payment_mode = args[4]
+        self.created_on = datetime.datetime.utcnow()
+        self.product_id = args[1]
+        self.quantity_to_be_sold = args[2]
+        self.payment_mode = args[3]
+        self.last_modified = datetime.datetime.utcnow()
 
     def check_available_product(self):
         """This checks if there is enough for sale"""
@@ -25,8 +25,8 @@ class Sales:
 
     def sale_product(self):
         """This creates a sale record after a product is sold"""
-        db.insert_sales(self.user_id, self.store_attendant, self.date_of_sale, self.product_id,
-                        self.quantity_to_be_sold, self.payment_mode)
+        db.insert_sales(self.user_id, self.created_on, self.product_id,
+                        self.quantity_to_be_sold, self.payment_mode, self.last_modified)
         sale_record = db.select_one('sales', 'user_id', self.user_id)
         return sale_record[2]
 

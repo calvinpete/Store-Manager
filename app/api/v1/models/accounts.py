@@ -8,12 +8,13 @@ db = DatabaseConnection()
 class Account:
     """This class holds the logic for managing accounts"""
 
-    def __init__(self, name, email_address, password, account_type):
-        self.name = name
-        self.email_address = email_address
-        self.password = password
-        self.account_type = account_type
-        self.date_of_register = datetime.datetime.utcnow()
+    def __init__(self, *args):
+        self.name = args[0]
+        self.email_address = args[1]
+        self.password = args[2]
+        self.account_type = args[3]
+        self.created_on = datetime.datetime.utcnow()
+        self.last_modified = datetime.datetime.utcnow()
 
     def check_user(self):
         """This checks if the user already has an account"""
@@ -22,7 +23,8 @@ class Account:
 
     def register(self):
         """This creates an account for a user"""
-        db.insert_user(self.name, self.email_address, self.password, self.account_type, self.date_of_register)
+        db.insert_user(self.name, self.email_address, self.password, self.account_type, self.created_on,
+                       self.last_modified)
         user = db.select_one('users', 'email_address', self.email_address)  # selects a specific row of the users table
         return user[1]  # picks the value in the 1st column from that row
 

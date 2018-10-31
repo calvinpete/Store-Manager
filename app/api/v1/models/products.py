@@ -8,34 +8,18 @@ db = DatabaseConnection()
 
 class Product:
     """This class holds the logic for managing inventory"""
-    def __init__(self, product_name, quantity, details, price):
-        self.product_name = product_name
-        self.quantity = quantity
-        self.details = details
-        self.price = price
+    def __init__(self, *args):
+        self.product_name = args[0]
+        self.quantity = args[1]
+        self.details = args[2]
+        self.price = args[3]
+        self.created_on = datetime.datetime.utcnow()
         self.last_modified = datetime.datetime.utcnow()
-
-    # def create_category(self, category):
-    #     """
-    #     This creates a list to hold products for that category
-    #     :param category:
-    #     :return:
-    #     """
-    #     self.stock[category] = []
-    #
-    # def check_category(self, category):
-    #     """
-    #     This checks if the category exists
-    #     :param category:
-    #     :return:
-    #     """
-    #     for key in self.stock.keys():
-    #         if category == key:
-    #             return True
 
     def add_product(self):
         """This adds a product to the inventory"""
-        db.insert_products(self.product_name, self.details, self.quantity, self.price, self.last_modified)
+        db.insert_products(self.product_name, self.details, self.quantity, self.price, self.created_on,
+                           self.last_modified)
         return self.product_name
 
     def check_product_existence(self):
@@ -43,12 +27,12 @@ class Product:
         product = db.select_one_product('products', 'product_name', self.product_name, 'details', self.details)
         if product is not None:
             db.update_product_quantity('product_name', self.product_name, 'details', self.details, product[3],
-                                       self.quantity, self.last_modified)
+                                       self.quantity, self.created_on)
             return True
 
     def modify_product(self, product_id):
         """This edits a single product's information"""
-        db.update_product(self.product_name, self.details, self.quantity, self.price, self.last_modified, product_id)
+        db.update_product(self.product_name, self.details, self.quantity, self.price, self.created_on, product_id)
 
     @staticmethod
     def get_single_product(product_id):
@@ -62,7 +46,8 @@ class Product:
                     'details': product[2],
                     'quantity': product[3],
                     'price': product[4],
-                    'Last Modified': product[5]
+                    'created_on': product[5],
+                    'last_modified': product[6]
                 }
             ), 200
         else:
@@ -80,7 +65,8 @@ class Product:
                 'details': product[2],
                 'quantity': product[3],
                 'price': product[4],
-                'Last Modified': product[5]
+                'created_on': product[5],
+                'last_modified': product[6]
             }
             inventory.append(single_item)
         return inventory
@@ -91,7 +77,6 @@ class Product:
         product = db.select_one('products', 'product_id', product_id)
         if product:
             db.delete_product(product_id)
-            db.before_delete_product()
             return jsonify({
                 "message": "{} of {} successfully removed from the inventory".format(product[1], product[2])
             }), 200
