@@ -2,6 +2,7 @@ class Config(object):
     """Parent configuration class"""
     SECRET_KEY = "VeryHardThoughtKey"
     DEBUG = False
+    TESTING = False
 
 
 class DevelopmentConfig(Config):

@@ -25,34 +25,39 @@ def method_not_allowed(error):
 
 @app.route('/store-manager/api/v1/auth/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    if len(data.keys()) != 2:
-        return jsonify({"message": "please type in the missing fields"}), 400
 
-    email_address = data['email_address']
-    password = data['password']
+    try:
 
-    validate = UserValidator(email_address, password)
+        data = request.get_json()
+        if len(data.keys()) != 2:
+            return jsonify({"message": "please type in the missing fields"}), 400
 
-    if Account.get_user_name(email_address) is None:
-        return jsonify({"message": "User does not exist, please register"}), 400
+        email_address = data['email_address']
+        password = data['password']
 
-    if not validate.check_password():
-        return jsonify({"message": "Invalid password, please try again"}), 400
-    else:
-        token = jwt.encode(
-            {
-                "email_address": email_address,
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-            },
-            Config.SECRET_KEY
-        )
-        return jsonify(
-            {
-                "token": token.decode("UTF-8"),
-                "message": "You have successfully logged in"
-            }
-        ), 200
+        validate = UserValidator(email_address, password)
+
+        if Account.get_user_name(email_address) is None:
+            return jsonify({"message": "User does not exist, please register"}), 400
+
+        if not validate.check_password():
+            return jsonify({"message": "Invalid password, please try again"}), 400
+        else:
+            token = jwt.encode(
+                {
+                    "email_address": email_address,
+                    "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+                },
+                Config.SECRET_KEY
+            )
+            return jsonify(
+                {
+                    "token": token.decode("UTF-8"),
+                    "message": "You have successfully logged in"
+                }
+            ), 200
+    except KeyError:
+        return jsonify({"message": "You should have email_address and password fields"}), 400
 
 
 def token_required(f):

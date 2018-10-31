@@ -16,34 +16,39 @@ def create_sale_record(current_user):
     if Account.check_admin(current_user) != 'store_attendant':
         return jsonify({"message": "Only a staff attendant can create a sale record"}), 401
 
-    data = request.get_json()
-    if len(data.keys()) != 4:
-        return jsonify({"message": "You should have the category, product_id, quantity and sale_type fields"}), 400
+    try:
 
-    product_id = data['product_id']
-    quantity_to_be_sold = data['quantity_to_be_sold']
-    payment_mode = data['payment_mode']
+        data = request.get_json()
+        if len(data.keys()) != 3:
+            return jsonify({"message": "You should have the product_id, quantity_to_be_sold and payment_mode fields"}), 400
 
-    if UserValidator.check_string_input(payment_mode=payment_mode):
-        return jsonify({"message": "Please enter a string"}), 400
+        product_id = data['product_id']
+        quantity_to_be_sold = data['quantity_to_be_sold']
+        payment_mode = data['payment_mode']
 
-    if UserValidator.check_integer_input(product_id=product_id, quantity_to_be_sold=quantity_to_be_sold):
-        return jsonify({"message": "Please enter an integer"}), 400
+        if UserValidator.check_string_input(payment_mode=payment_mode):
+            return jsonify({"message": "Please enter a string"}), 400
 
-    if UserValidator.check_input_validity(payment_mode=payment_mode):
-        return jsonify({"message": "Values are required"}), 400
+        if UserValidator.check_integer_input(product_id=product_id, quantity_to_be_sold=quantity_to_be_sold):
+            return jsonify({"message": "Please enter an integer"}), 400
 
-    staff_sales = Sales(Account.get_user_id(current_user), Account.get_user_name(current_user),
-                        product_id, quantity_to_be_sold, payment_mode)
+        if UserValidator.check_input_validity(payment_mode=payment_mode):
+            return jsonify({"message": "Values are required"}), 400
 
-    if db.select_one('products', 'product_id', product_id) is None:
-        return jsonify({"message": "Product does not exist"}), 404
+        staff_sales = Sales(Account.get_user_id(current_user), Account.get_user_name(current_user),
+                            product_id, quantity_to_be_sold, payment_mode)
 
-    if not staff_sales.check_available_product():
-        return jsonify({"message": "Invalid quantity requested"}), 404
+        if db.select_one('products', 'product_id', product_id) is None:
+            return jsonify({"message": "Product does not exist"}), 404
 
-    staff_sales.sale_product()
-    return jsonify({"message": "Sale record successfully created"}), 201
+        if not staff_sales.check_available_product():
+            return jsonify({"message": "Invalid quantity requested"}), 404
+
+        staff_sales.sale_product()
+        return jsonify({"message": "Sale record successfully created"}), 201
+
+    except KeyError:
+        return jsonify({"message": "You should have the product_id, quantity_to_be_sold and payment_mode fields"}), 400
 
 
 @app.route('/store-manager/api/v1/sales/<sale_id>', methods=['GET'])

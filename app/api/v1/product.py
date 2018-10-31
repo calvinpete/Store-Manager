@@ -93,37 +93,42 @@ def modify_product(current_user, product_id):
     if Account.check_admin(current_user) != 'admin':
         return jsonify({"message": "You do not have administrator access"}), 401
 
-    data = request.get_json()
-    if len(data.keys()) != 4:
+    try:
+
+        data = request.get_json()
+        if len(data.keys()) != 4:
+            return jsonify({"message": "You should have the product_name, quantity, details and price fields"}), 400
+
+        product_name = data['product_name']
+        quantity = data['quantity']
+        details = data['details']
+        price = data['price']
+
+        if UserValidator.check_string_input(
+                product_name=product_name,
+                details=details):
+            return jsonify({"message": "Please enter a string"}), 400
+
+        if UserValidator.check_integer_input(
+                quantity=quantity,
+                price=price):
+            return jsonify({"message": "Please enter an integer"}), 400
+
+        if UserValidator.check_input_validity(
+                product_name=product_name,
+                details=details):
+            return jsonify({"message": "Values are required"}), 400
+
+        item = Product(product_name, quantity, details, price)
+
+        if db.select_one('products', 'product_id', product_id) is not None:
+            return jsonify({"message": "Product does not exist"}), 404
+
+        item.modify_product(product_id)
+        return jsonify({"message": "Product successfully modified"}), 200
+
+    except KeyError:
         return jsonify({"message": "You should have the product_name, quantity, details and price fields"}), 400
-
-    product_name = data['product_name']
-    quantity = data['quantity']
-    details = data['details']
-    price = data['price']
-
-    if UserValidator.check_string_input(
-            product_name=product_name,
-            details=details):
-        return jsonify({"message": "Please enter a string"}), 400
-
-    if UserValidator.check_integer_input(
-            quantity=quantity,
-            price=price):
-        return jsonify({"message": "Please enter an integer"}), 400
-
-    if UserValidator.check_input_validity(
-            product_name=product_name,
-            details=details):
-        return jsonify({"message": "Values are required"}), 400
-
-    item = Product(product_name, quantity, details, price)
-
-    if db.select_one('products', 'product_id', product_id) is not None:
-        return jsonify({"message": "Product does not exist"}), 404
-
-    item.modify_product(product_id)
-    return jsonify({"message": "Product successfully modified"}), 200
 
 
 @app.route('/store-manager/api/v1/products/<product_id>', methods=['DELETE'])
