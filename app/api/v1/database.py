@@ -172,7 +172,7 @@ class DatabaseConnection:
         return row
 
     def update_product(self, *args):
-        """This method selects one row in the products table modifies all the column values"""
+        """This method selects one row in the products table then modifies all the column values"""
         product_name = args[0]
         details = args[1]
         quantity = args[2]
@@ -183,6 +183,36 @@ class DatabaseConnection:
                      "last_modified = '{}' WHERE product_id = '{}';"\
             .format(product_name, details, quantity, price, last_modified, product_id)
         self.cursor.execute(update_row, (product_name, details, quantity, price, last_modified, product_id))
+        self.connection.commit()
+
+    def delete_product(self, product_id):
+        """This method selects one row in the products table then deletes it"""
+        delete_row = "DELETE FROM products WHERE 'product_id' = {}".format(product_id)
+        self.cursor.execute(delete_row, [product_id])
+        self.connection.commit()
+
+    def before_delete_product(self):
+        """This method keeps a copy of the sale_record just before a product is deleted"""
+        sale_copies = "CREATE TABLE IF NOT EXISTS sales_copies (record_id SERIAL PRIMARY KEY, " \
+                      "user_id, store_attendant VARCHAR(255) UNIQUE NOT NULL, date_of_sale TIMESTAMP NOT NULL, " \
+                      "product_id INT NOT NULL, quantity_sold NUMERIC NOT NULL, total_cost NUMERIC NOT NULL, " \
+                      "payment_mode VARCHAR(255) NOT NULL);"
+        self.cursor.execute(sale_copies)
+        self.connection.commit()
+
+        trigger_function = "CREATE FUNCTION copy_sale() RETURNS trigger AS $BODY$" \
+                           "BEGIN " \
+                           "INSERT INTO sales_copies VALUES(OLD.record_id, OLD.user_id, OLD.store_attendant, " \
+                           "OLD.date_of_sale, OLD.product_id, OLD.quantity_sold, OLD.total_cost, OLD.payment_mode)" \
+                           "RETURN OLD;" \
+                           "END;" \
+                           "$BODY$;"
+        self.cursor.execute(trigger_function)
+        self.connection.commit()
+
+        delete_trigger = "CREATE TRIGGER copy_deleted_sale BEFORE DELETE ON products FOR EACH ROW " \
+                         "EXECUTE PROCEDURE copy_sale();"
+        self.cursor.execute(delete_trigger)
         self.connection.commit()
 
     def drop_tables(self, table):
