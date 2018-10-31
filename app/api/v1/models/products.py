@@ -46,6 +46,10 @@ class Product:
                                        self.quantity, self.last_modified)
             return True
 
+    def modify_product(self, product_id):
+        """This edits a single product's information"""
+        db.update_product(self.product_name, self.details, self.quantity, self.price, self.last_modified, product_id)
+
     @staticmethod
     def get_single_product(product_id):
         """This fetches a single product"""
