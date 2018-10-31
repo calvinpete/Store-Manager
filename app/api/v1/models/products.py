@@ -84,3 +84,16 @@ class Product:
             }
             inventory.append(single_item)
         return inventory
+
+    @staticmethod
+    def delete_product(product_id):
+        """This removes a product from the inventory"""
+        product = db.select_one('products', 'product_id', product_id)
+        if product:
+            db.delete_product(product_id)
+            db.before_delete_product()
+            return jsonify({
+                "message": "{} of {} successfully removed from the inventory".format(product[1], product[2])
+            }), 200
+        else:
+            return jsonify({"message": "Product does not exist"}), 404
