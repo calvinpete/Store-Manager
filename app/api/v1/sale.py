@@ -46,16 +46,17 @@ def create_sale_record(current_user):
     return jsonify({"message": "Sale record successfully created"}), 201
 
 
-# @app.route('/store-manager/api/v1/sales/<sale_id>', methods=['GET'])
-# @token_required
-# def get_single_sale_record(current_user, sale_id):
-#     return Sales.get_sale_record(sale_id)
-#
-# @app.route('/store-manager/api/v1/sales', methods=['GET'])
-# @token_required
-# def get_all_sale_records(current_user):
-#
-#     if Account.check_admin(current_user) != 'admin':
-#         return jsonify({"message": "You do not have administrator access"}), 401
-#
-#     return jsonify(staff_sales.get_all_sales()), 200
+@app.route('/store-manager/api/v1/sales/<sale_id>', methods=['GET'])
+@token_required
+def get_single_sale_record(current_user, sale_id):
+    return Sales.get_sale_record(sale_id)
+
+
+@app.route('/store-manager/api/v1/sales', methods=['GET'])
+@token_required
+def get_all_sale_records(current_user):
+
+    if Account.check_admin(current_user) != 'admin':
+        return jsonify({"message": "You do not have administrator access"}), 401
+
+    return jsonify(Sales.get_all_sales()), 200
