@@ -50,12 +50,12 @@ class UserValidator:
     @staticmethod
     def check_integer_input(**kwargs):
         """
-        This checks if the parameters are not integers
+        This checks if the parameters are not positive integers
         :param kwargs:
         :return:
         """
         for (k, v) in kwargs.items():
-            if isinstance(v, str) or isinstance(v, float) or isinstance(v, list):
+            if isinstance(v, str) or isinstance(v, float) or isinstance(v, list) or v < 0:
                 return True
 
     class ProductValidator:
