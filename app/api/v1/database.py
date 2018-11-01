@@ -157,6 +157,12 @@ class DatabaseConnection:
         self.cursor.execute(update_row)
         self.connection.commit()
 
+    def restock_product_quantity(self, product_id, quantity):
+        update_row = "UPDATE products SET quantity = quantity + {} WHERE product_id = '{}';"\
+            .format(quantity, product_id)
+        self.cursor.execute(update_row, (quantity, product_id))
+        self.connection.commit()
+
     def select_all_sales(self):
         """
         This method selects all rows of the sales table together with:

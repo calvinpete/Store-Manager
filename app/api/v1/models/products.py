@@ -39,6 +39,16 @@ class Product:
             return jsonify({"message": "Product does not exist"}), 404
 
     @staticmethod
+    def stock_product(product_id, quantity):
+        """This restocks a product"""
+        product = db.select_one('products', 'product_id', product_id)
+        if product:
+            db.restock_product_quantity(product_id, quantity)
+            return jsonify({"message": "Product successfully restocked"}), 200
+        else:
+            return jsonify({"message": "Product does not exist"}), 404
+
+    @staticmethod
     def get_single_product(product_id):
         """This fetches a single product"""
         product = db.select_one('products', 'product_id', product_id)

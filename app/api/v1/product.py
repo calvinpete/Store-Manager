@@ -123,3 +123,30 @@ def delete_product(current_user, product_id):
         return jsonify({"message": "You do not have administrator access"}), 401
 
     return Product.delete_product(product_id)
+
+
+@app.route('/store-manager/api/v1/inventory', methods=['POST'])
+@token_required
+def stock_product(current_user):
+
+    if Account.check_admin(current_user) != 'admin':
+        return jsonify({"message": "You do not have administrator access"}), 401
+
+    try:
+
+        data = request.get_json()
+        if len(data.keys()) != 2:
+            return jsonify({"message": "please make sure you have the product_id and quantity fields only"}), 400
+
+        product_id = data['product_id']
+        quantity = data['quantity']
+
+        if UserValidator.check_integer_input(quantity=quantity):
+            return jsonify({"message": "Please note that the value of quantity should be a positive integer"}), 400
+
+        if UserValidator.check_integer_input(product_id=product_id):
+            return jsonify({"message": "Please note that the value of product_id should be a positive integer"}), 400
+
+        return Product.stock_product(product_id, quantity)
+    except KeyError:
+        return jsonify({"message": "please make sure you have the product_id and quantity fields only"}), 400
