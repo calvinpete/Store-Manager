@@ -2,12 +2,12 @@ import datetime
 from flask import jsonify
 from app.api.v1.database import DatabaseConnection
 
-
 db = DatabaseConnection()
 
 
 class Product:
     """This class holds the logic for managing inventory"""
+
     def __init__(self, *args):
         self.product_name = args[0]
         self.quantity = args[1]
@@ -18,9 +18,18 @@ class Product:
 
     def add_product(self):
         """This adds a product to the inventory"""
-        db.insert_products(self.product_name, self.details, self.quantity, self.price, self.created_on,
-                           self.last_modified)
-        return self.product_name
+        product_id = db.insert_products(self.product_name, self.details, self.quantity, self.price,
+                                        self.created_on, self.last_modified)
+        product = db.select_one('products', 'product_id', product_id)
+        return {
+            'product_id': product[0],
+            'created_on': product[5],
+            'last_modified': product[6],
+            'product_name': product[1],
+            'details': product[2],
+            'quantity': product[3],
+            'price': product[4]
+        }
 
     def check_product_existence(self):
         """This checks if the product already exists then updates its quantity"""
@@ -34,9 +43,30 @@ class Product:
         if product:
             db.update_product(self.product_name, self.details, self.quantity, self.price, self.last_modified,
                               product_id)
-            return jsonify({"message": "Product successfully modified"}), 200
+            new_product = db.select_one('products', 'product_id', product_id)
+            return jsonify({
+                "message": "Product successfully modified",
+                "old_product_info": {
+                    'product_id': product[0],
+                    'created_on': product[5],
+                    'last_modified': product[6],
+                    'product_name': product[1],
+                    'details': product[2],
+                    'quantity': product[3],
+                    'price': product[4]
+                },
+                "new_product_info": {
+                    'product_id': new_product[0],
+                    'created_on': new_product[5],
+                    'last_modified': new_product[6],
+                    'product_name': new_product[1],
+                    'details': new_product[2],
+                    'quantity': new_product[3],
+                    'price': new_product[4]
+                }
+            }), 200
         else:
-            return jsonify({"message": "Product does not exist"}), 404
+            return jsonify({"message": "Product with id {} does not exist".format(product_id)}), 404
 
     @staticmethod
     def stock_product(product_id, quantity):
@@ -46,7 +76,7 @@ class Product:
             db.restock_product_quantity(product_id, quantity)
             return jsonify({"message": "Product successfully restocked"}), 200
         else:
-            return jsonify({"message": "Product does not exist"}), 404
+            return jsonify({"message": "Product of id {} does not exist".format(product_id)}), 404
 
     @staticmethod
     def get_single_product(product_id):
@@ -65,7 +95,7 @@ class Product:
                 }
             ), 200
         else:
-            return jsonify({"message": "Product does not exist"}), 404
+            return jsonify({"message": "Product of id {} does not exist".format(product_id)}), 404
 
     @staticmethod
     def get_all_products():
@@ -95,4 +125,4 @@ class Product:
                 "message": "{} of {} successfully removed from the inventory".format(product[1], product[2])
             }), 200
         else:
-            return jsonify({"message": "Product does not exist"}), 404
+            return jsonify({"message": "Product of id {} does not exist".format(product_id)}), 404

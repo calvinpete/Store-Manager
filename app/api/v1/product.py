@@ -49,8 +49,7 @@ def add_product(current_user):
         item = Product(product_name, quantity, details, price)
 
         if not item.check_product_existence():
-            item.add_product()
-            return jsonify({"message": "Product successfully added"}), 201
+            return jsonify({"product": item.add_product(), "message": "Product successfully added"}), 201
         else:
             return jsonify({"message": "Product already exists"}), 200
     except KeyError:

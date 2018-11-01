@@ -96,10 +96,12 @@ class DatabaseConnection:
         created_on = args[4]
         last_modified = args[5]
         insert_product = "INSERT INTO products(product_name, details, quantity, price, created_on, last_modified) " \
-                         "VALUES('{}', '{}', '{}', '{}', '{}', '{}');"\
+                         "VALUES('{}', '{}', '{}', '{}', '{}', '{}')RETURNING product_id;"\
             .format(product_name, details, quantity, price, created_on, last_modified)
         self.cursor.execute(insert_product, (product_name, details, quantity, price, created_on, last_modified))
         self.connection.commit()
+        column_value = self.cursor.fetchone()[0]
+        return column_value
 
     def insert_sale_record(self, *args):
         """This method captures a sale when a product is sold"""
