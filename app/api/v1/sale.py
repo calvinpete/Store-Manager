@@ -36,7 +36,7 @@ def create_sale_record(current_user):
             return jsonify({"message": "Please make sure you have the value of payment mode"}), 400
 
         sale_order_id = Sales(Account.get_user_id(current_user))
-        code = sale_order_id.sale_order()
+        sale_code = sale_order_id.sale_order()
 
         for product in shopping_cart:
             product_id = product.get('product_id')
@@ -56,11 +56,11 @@ def create_sale_record(current_user):
                     return jsonify({"message": "Please note that the value of quantity_to_be_sold "
                                                "should be a positive integer"}), 400
 
-                staff_sales = SaleProduct(code, Account.get_user_id(current_user), product_id,
+                staff_sales = SaleProduct(sale_code, Account.get_user_id(current_user), product_id,
                                           quantity_to_be_sold, payment_mode, sale_order_id.last_modified)
 
                 if db.select_one('products', 'product_id', product_id) is None:
-                    return jsonify({"message": "Product does not exist"}), 404
+                    return jsonify({"message": "Product of id {} does not exist".format(product_id)}), 404
 
                 if not staff_sales.check_available_product():
                     return jsonify({"message": "Invalid quantity requested"}), 404
@@ -70,7 +70,7 @@ def create_sale_record(current_user):
                 return jsonify({"message": "Please make sure you have the product_id and "
                                            "quantity_to_be_sold fields only"}), 400
 
-        return jsonify({"message": "Sale record successfully created"}), 201
+        return jsonify({"message": "Sale record of id {} has been successfully created".format(sale_code)}), 201
 
     except KeyError:
         return jsonify({"message": "Please make sure you have the shopping cart and payment_mode fields only"}), 400

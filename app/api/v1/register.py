@@ -56,7 +56,7 @@ def register_staff(current_user):
         staff = Account(name, email_address, password, account_type)
 
         if staff.check_user():
-            return jsonify({"message": "User already exists"}), 409
+            return jsonify({"message": "{} is already exists".format(name)}), 409
         else:
             user = staff.register()
             return jsonify({"message": "{} has been successfully registered".format(user)}), 201

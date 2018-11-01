@@ -42,7 +42,7 @@ def login():
             return jsonify({"message": "User does not exist, please register"}), 400
 
         if not validate.check_password():
-            return jsonify({"message": "Invalid password, please try again"}), 400
+            return jsonify({"message": "wrong password, please try again"}), 400
         else:
             token = jwt.encode(
                 {

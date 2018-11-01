@@ -53,15 +53,6 @@ class SaleProduct:
         grand_total = 0
         if sale_record:
             for column in sale_record:
-                sale_single_record = {
-                    'sale_id': int(record_id),
-                    'created_on': column[6],
-                    'user_id': column[5],
-                    'store_attendant': column[9],
-                    'products_sold': products_sold,
-                    'grand_total': grand_total,
-                    'payment_mode': column[4]
-                }
                 products_sold.append(
                     {
                         'product_id': column[1],
@@ -72,9 +63,18 @@ class SaleProduct:
                     }
                 )
                 grand_total += column[3]
+                sale_single_record = {
+                    'sale_id': int(record_id),
+                    'created_on': column[6],
+                    'user_id': column[5],
+                    'store_attendant': column[9],
+                    'products_sold': products_sold,
+                    'grand_total': grand_total,
+                    'payment_mode': column[4]
+                }
             return jsonify(sale_single_record), 200
         else:
-            return jsonify({"message": "Sale record does not exist"}), 404
+            return jsonify({"message": "Sale record of id {} does not exist".format(record_id)}), 404
 
     @staticmethod
     def get_all_sales():
