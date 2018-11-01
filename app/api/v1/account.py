@@ -30,7 +30,8 @@ def login():
 
         data = request.get_json()
         if len(data.keys()) != 2:
-            return jsonify({"message": "please type in the missing fields"}), 400
+            return jsonify({"message": "please make sure you have both "
+                                       "the email_address field and password field only"}), 400
 
         email_address = data['email_address']
         password = data['password']
@@ -57,7 +58,8 @@ def login():
                 }
             ), 200
     except KeyError:
-        return jsonify({"message": "You should have email_address and password fields"}), 400
+        return jsonify({"message": "please make sure you have both "
+                                   "the email_address field and password field only"}), 400
 
 
 def token_required(f):

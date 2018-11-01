@@ -16,7 +16,8 @@ def register_staff(current_user):
 
         data = request.get_json()
         if len(data.keys()) != 4:
-            return jsonify({"message": "please type in the missing fields"}), 400
+            return jsonify({"message": "please make sure you have the name, email_address, password and "
+                                       "account_type fields only!"}), 400
 
         name = data['name']
         email_address = data['email_address']
@@ -25,19 +26,29 @@ def register_staff(current_user):
 
         validate = UserValidator(email_address, password)
 
-        if validate.check_string_input(
-                name=name,
-                email_address=email_address,
-                password=password,
-                account_type=account_type):
-            return jsonify({"message": "Please enter a string"}), 400
+        if UserValidator.check_string_input(name=name):
+            return jsonify({"message": "Please note that the value of name should be a string"}), 400
 
-        if validate.check_input_validity(
-                name=name,
-                email_address=email_address,
-                password=password,
-                account_type=account_type):
-            return jsonify({"message": "Values are required"}), 400
+        if UserValidator.check_string_input(email_address=email_address):
+            return jsonify({"message": "Please note that the value of email_address should be a string"}), 400
+
+        if UserValidator.check_string_input(password=password):
+            return jsonify({"message": "Please note that the value of password should be a string"}), 400
+
+        if UserValidator.check_string_input(account_type=account_type):
+            return jsonify({"message": "Please note that the account_type value should be a string"}), 400
+
+        if UserValidator.check_input_validity(name=name):
+            return jsonify({"message": "Please note that the value of name is missing"}), 400
+
+        if UserValidator.check_input_validity(email_address=email_address):
+            return jsonify({"message": "Please note that the value of email_address is missing"}), 400
+
+        if UserValidator.check_input_validity(password=password):
+            return jsonify({"message": "Please note that the value of password is missing"}), 400
+
+        if UserValidator.check_input_validity(account_type=account_type):
+            return jsonify({"message": "Please note that the account_type value is missing"}), 400
 
         if not validate.validate_email_address():
             return jsonify({"message": "The email should follow the format of valid emails (johndoe@mail.com)"}), 400
@@ -51,5 +62,5 @@ def register_staff(current_user):
             return jsonify({"message": "{} has been successfully registered".format(user)}), 201
 
     except KeyError:
-        return jsonify({"message": "please type in the missing fields"}), 400
-
+        return jsonify({"message": "please make sure you have the name, email_address, password and "
+                                   "account_type fields only!"}), 400
