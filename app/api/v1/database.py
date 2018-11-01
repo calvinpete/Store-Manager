@@ -27,7 +27,7 @@ class DatabaseConnection:
         """This creates a user table, product table and a sales table"""
         user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
                      "name VARCHAR(255) NOT NULL, email_address VARCHAR(255) UNIQUE NOT NULL, " \
-                     "password VARCHAR(255) NOT NULL, account_type VARCHAR(255) NOT NULL, " \
+                     "password VARCHAR(500) NOT NULL, account_type VARCHAR(255) NOT NULL, " \
                      "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
                      "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
         self.cursor.execute(user_table)

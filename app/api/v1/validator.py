@@ -1,5 +1,6 @@
 import re
 from app.api.v1.database import DatabaseConnection
+from werkzeug.security import check_password_hash
 
 
 db = DatabaseConnection()
@@ -13,7 +14,7 @@ class UserValidator:
 
     def check_password(self):
         """This checks if the password exists"""
-        if db.select_one('users', 'password', self.password) is not None:
+        if check_password_hash(db.select_one('users', 'email_address', self.email_address)[3], self.password):
             return True
 
     def validate_email_address(self):

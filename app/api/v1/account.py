@@ -6,6 +6,7 @@ from app.api.v1 import app
 from app.api.v1.models.accounts import Account
 from app.api.v1.validator import UserValidator
 from instance.config import Config
+from werkzeug.security import generate_password_hash
 
 
 @app.errorhandler(400)

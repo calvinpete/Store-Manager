@@ -3,6 +3,7 @@ from app.api.v1 import app
 from app.api.v1.models.accounts import Account
 from app.api.v1.validator import UserValidator
 from app.api.v1.account import token_required
+from werkzeug.security import generate_password_hash
 
 
 @app.route('/store-manager/api/v1/auth/signup', methods=['POST'])
@@ -53,7 +54,7 @@ def register_staff(current_user):
         if not validate.validate_email_address():
             return jsonify({"message": "The email should follow the format of valid emails (johndoe@mail.com)"}), 400
 
-        staff = Account(name, email_address, password, account_type)
+        staff = Account(name, email_address, generate_password_hash(password), account_type)
 
         if staff.check_user():
             return jsonify({"message": "{} is already exists".format(name)}), 409
