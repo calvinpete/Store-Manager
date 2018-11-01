@@ -1,9 +1,12 @@
 import unittest
 import json
+import datetime
 from app.api.v1.models.accounts import Account
-from app.api.v1.models.products import Product
-from app.api.v1.models.sales import Sales, item
-from app.api.v1 import *
+# from app.api.v1.models.products import Product
+# from app.api.v1.models.sales import SaleProduct, Sales
+from app.api.v1 import app
+from instance.config import app_config
+from app.api.v1.database import DatabaseConnection
 
 
 class TestBase(unittest.TestCase):
@@ -20,21 +23,19 @@ class TestBase(unittest.TestCase):
         """
         # app reconfiguration
         app.config.from_object(app_config["testing"])
+        with app.app_context():
+            test_db = DatabaseConnection()
+            test_db.create_tables()
+            test_db.default_admin_setup("test_owner", "test_admin@gmail.com", "test_ad", "admin",
+                                        datetime.datetime.utcnow(), datetime.datetime.utcnow())
 
         # flask test client object
         self.app = app.test_client()
 
         # sample data
-        self.test_data00 = {"category": "Foot wear"}
-        self.test_data01 = {"category": "Spices"}
-        self.test_data02 = {"category": 5}
-        self.test_data03 = {"category": 6.8}
-        self.test_data04 = {"category": ['Snacks', 8]}
-        self.test_data05 = {"category": ""}
-        self.test_data07 = {"category": " "}
-        self.test_data08 = {"category": "Drinks"}
-        self.test_data081 = {"category": "Juices"}
-        self.test_data082 = {"category": "Detergents"}
+        self.test_admin_data = {"email_address": "test_admin@gmail.com", "password": "test_ad"}
+        self.user_account = Account("Mario", "MK@gmail.com", "Li/", "staff_attendant")
+
         self.test_data09 = {}
         self.test_data10 = {"name": "Mario", "email_address": "MK@gmail.com", "password": "Li/"}
         self.test_data11 = {"email_address": "MK@gmail.com", "password": "Li/"}
@@ -79,7 +80,6 @@ class TestBase(unittest.TestCase):
         self.test_data431 = {"category": "Drinks", "product_id": 1, "quantity": 0, "sale_type": "cash"}
         self.test_data44 = {"category": "Spices", "product_id": 100, "quantity": 12, "sale_type": "cash"}
         self.test_data44 = {"category": "Beverages", "product_id": 1, "quantity": 12, "sale_type": "cash"}
-        self.user_account = Account()
         self.test_user1 = {"name": "Robe", "email_address": "Robe@gmail.com", "password": "R&e"}
         self.test_user11 = {}
         self.test_user12 = {"name": 4, "email_address": "JohnP@gmail.com", "password": "Hal0-pEt7&"}
@@ -105,12 +105,10 @@ class TestBase(unittest.TestCase):
         self.test_user29 = {"name": "Joe", "email_address": "Joe@gmail.com", "password": "fqc"}
         self.test_user30 = {"name": "Land", "email_address": "ecs@gmail.com", "password": "r352"}
 
-        # sample user
-        self.app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                      data=json.dumps(self.test_data10))
-        login_test_user = self.app.post('/store-manager/api/v1/auth/login', content_type="application/json",
-                                        data=json.dumps(self.test_data11))
-        user_logged_in_data = json.loads(login_test_user.data.decode())
+        # sample admin user login
+        login_test_admin = self.app.post('/store-manager/api/v1/auth/login', content_type="application/json",
+                                         data=json.dumps(self.test_admin_data))
+        user_logged_in_data = json.loads(login_test_admin.data.decode())
         self.token = user_logged_in_data["token"]
 
         # sample non admin user
@@ -121,32 +119,40 @@ class TestBase(unittest.TestCase):
         staff_logged_in_data = json.loads(login_test_staff.data.decode())
         self.token_staff = staff_logged_in_data["token"]
 
-        # Product class methods
-        self.goods = Product()
-        self.goods.create_category(self.test_data01["category"])
-        self.goods.add_product(
-            self.test_data01["category"],
-            self.test_data24["product_name"],
-            self.test_data24["quantity"],
-            self.test_data24["details"],
-            self.test_data24["price"])
+        # # Product class methods
+        # self.goods = Product()
+        # self.goods.create_category(self.test_data01["category"])
+        # self.goods.add_product(
+        #     self.test_data01["category"],
+        #     self.test_data24["product_name"],
+        #     self.test_data24["quantity"],
+        #     self.test_data24["details"],
+        #     self.test_data24["price"])
+        #
+        # # Account class methods
+        # self.user_account.register(self.test_user23["name"], self.test_user23["email_address"],
+        #                            self.test_user23["password"])
+        # self.store_attendant = self.user_account.get_user_name(1)
+        #
+        # # Sales class test methods
+        # self.sample_sales = Sales()
+        # item.create_category(self.test_data08["category"])
+        # item.add_product(
+        #     self.test_data08["category"],
+        #     self.test_data28["product_name"],
+        #     self.test_data28["quantity"],
+        #     self.test_data28["details"],
+        #     self.test_data28["price"]
+        # )
+        # self.sample_sales.sale_product("Drinks", 1, 10, "cash", self.store_attendant)
 
-        # Account class methods
-        self.user_account.register(self.test_user23["name"], self.test_user23["email_address"],
-                                   self.test_user23["password"])
-        self.store_attendant = self.user_account.get_user_name(1)
-
-        # Sales class test methods
-        self.sample_sales = Sales()
-        item.create_category(self.test_data08["category"])
-        item.add_product(
-            self.test_data08["category"],
-            self.test_data28["product_name"],
-            self.test_data28["quantity"],
-            self.test_data28["details"],
-            self.test_data28["price"]
-        )
-        self.sample_sales.sale_product("Drinks", 1, 10, "cash", self.store_attendant)
+    def tearDown(self):
+        with app.app_context():
+            db = DatabaseConnection()
+            db.drop_tables('users')
+            db.drop_tables('sales')
+            db.drop_tables('products')
+            db.drop_tables('sale_point')
 
     def test_existence(self):
         """

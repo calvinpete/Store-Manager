@@ -12,9 +12,7 @@ class TestProductApi(TestBase):
         """
         This tests add a product route
         """
-        self.app.post("/store-manager/api/v1/category", content_type="application/json", 
-                      data=json.dumps(self.test_data081), headers={'x-access-token': self.token})
-        response = self.app.post('/store-manager/api/v1/Juices/products', content_type="application/json",
+        response = self.app.post('/store-manager/api/v1/products', content_type="application/json",
                                  data=json.dumps(self.test_data30), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 201)
         response_message = json.loads(response.data.decode())
