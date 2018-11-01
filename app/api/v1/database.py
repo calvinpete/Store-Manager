@@ -40,9 +40,15 @@ class DatabaseConnection:
         self.cursor.execute(product_table)
         self.connection.commit()
 
+        sale_point_table = "CREATE TABLE IF NOT EXISTS sale_point (sale_id SERIAL PRIMARY KEY, " \
+                           "user_id INT NOT NULL REFERENCES users(user_id), " \
+                           "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
+                           "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        self.cursor.execute(sale_point_table)
+        self.connection.commit()
+
         sales_table = "CREATE TABLE IF NOT EXISTS sales (record_id SERIAL PRIMARY KEY, " \
-                      "user_id INT NOT NULL REFERENCES users(user_id), " \
-                      "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL," \
+                      "sale_id INT NOT NULL REFERENCES sale_point(sale_id), " \
                       "product_id INT NOT NULL REFERENCES products(product_id), " \
                       "quantity_sold NUMERIC NOT NULL, total_cost NUMERIC NOT NULL, " \
                       "payment_mode VARCHAR(255) NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
@@ -95,23 +101,27 @@ class DatabaseConnection:
         self.cursor.execute(insert_product, (product_name, details, quantity, price, created_on, last_modified))
         self.connection.commit()
 
+    def insert_sale_record(self, *args):
+        """This method captures a sale when a product is sold"""
+        user_id = args[0]
+        created_on = args[1]
+        last_modified = args[2]
+        insert_sales = "INSERT INTO sale_point(user_id, created_on, last_modified ) VALUES('{}', '{}', '{}');"\
+            .format(user_id, created_on, last_modified)
+        self.cursor.execute(insert_sales, (user_id, created_on, last_modified))
+        self.connection.commit()
+
     def insert_sales(self, *args):
         """This method inserts a sale record into the database"""
-        user_id = args[0]
-        date_of_sale = args[1]
-        product_id = args[2]
-        quantity_sold = args[3]
-        total_cost = self.select_one('products', 'product_id', product_id)[4]
-        payment_mode = args[4]
-        created_on = args[5]
-        last_modified = args[6]
-        insert_sales = "INSERT INTO sales(user_id, date_of_sale, product_id, quantity_sold, total_cost, " \
-                       "payment_mode, created_on, last_modified ) " \
-                       "VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');"\
-            .format(user_id, date_of_sale, product_id, quantity_sold, total_cost, payment_mode, created_on,
-                    last_modified)
-        self.cursor.execute(insert_sales, (user_id, date_of_sale, product_id, quantity_sold,
-                                           payment_mode, created_on, last_modified))
+        sale_id = args[0]
+        product_id = args[1]
+        quantity_sold = args[2]
+        total_cost = self.select_one('products', 'product_id', product_id)[4] * quantity_sold
+        payment_mode = args[3]
+        insert_sales = "INSERT INTO sales(sale_id, product_id, quantity_sold, total_cost, payment_mode) " \
+                       "VALUES('{}', '{}', '{}', '{}', '{}');"\
+            .format(sale_id, product_id, quantity_sold, total_cost, payment_mode)
+        self.cursor.execute(insert_sales, (sale_id, product_id, quantity_sold, payment_mode))
         self.connection.commit()
 
     def select_all(self, table):
@@ -136,16 +146,12 @@ class DatabaseConnection:
         return row
 
     def update_product_quantity(self, *args):
-        """This method selects one row in a table given the column then modifies the column value"""
-        column_1 = args[0]
-        value_1 = args[1]
-        column_2 = args[2]
-        value_2 = args[3]
-        old_quantity = args[4]
-        new_quantity = args[5]
-        value_3 = args[6]
-        update_row = "UPDATE products SET quantity = {} + {}, last_modified = '{}' WHERE {}='{}' AND {}='{}';"\
-            .format(old_quantity, new_quantity, value_3, column_1, value_1, column_2, value_2)
+        """This method modifies the quantity in the product table after sale"""
+        quantity_sold = args[0]
+        last_modified = args[1]
+        product_id = args[2]
+        update_row = "UPDATE products SET quantity = quantity - {}, last_modified = '{}' WHERE product_id ='{}';"\
+            .format(quantity_sold, last_modified, product_id)
         self.cursor.execute(update_row)
         self.connection.commit()
 
@@ -155,11 +161,12 @@ class DatabaseConnection:
         - Two columns of the products table
         - One column of the users table
         """
-        select_sales = "SELECT sales.record_id, sales.user_id, sales.date_of_sale, sales.product_id, " \
-                       "sales.quantity_sold, sales.total_cost, sales.payment_mode, products.product_name, " \
+        select_sales = "SELECT sales.sale_id, sales.product_id, sales.quantity_sold, sales.total_cost, " \
+                       "sales.payment_mode, sale_point.user_id, sale_point.created_on, products.product_name, " \
                        "products.details, users.name FROM sales " \
+                       "INNER JOIN sale_point ON sale_point.sale_id = sales.sale_id " \
                        "INNER JOIN products ON products.product_id = sales.product_id " \
-                       "INNER JOIN users ON users.user_id = sales.user_id ORDER BY sales.date_of_sale;"
+                       "INNER JOIN users ON users.user_id = sale_point.user_id;"
         self.cursor.execute(select_sales)
         rows = self.cursor.fetchall()
         return rows
@@ -170,11 +177,13 @@ class DatabaseConnection:
         - Two columns of the products table
         - One column of the users table
         """
-        select_sale = "SELECT sales.user_id, sales.date_of_sale, sales.product_id, sales.quantity_sold, " \
-                      "sales.total_cost, sales.payment_mode, products.product_name, products.details, " \
-                      "users.name FROM sales INNER JOIN products ON products.product_id = sales.product_id " \
-                      "INNER JOIN users ON users.user_id = sales.user_id " \
-                      "WHERE sales.record_id = '{}';".format(record_id)
+        select_sale = "SELECT sales.sale_id, sales.product_id, sales.quantity_sold, sales.total_cost, " \
+                      "sales.payment_mode, sale_point.user_id, sale_point.created_on, products.product_name, " \
+                      "products.details, users.name FROM sales " \
+                      "INNER JOIN sale_point ON sale_point.sale_id = sales.sale_id " \
+                      "INNER JOIN products ON products.product_id = sales.product_id " \
+                      "INNER JOIN users ON users.user_id = sale_point.user_id " \
+                      "WHERE sales.sale_id = {};".format(record_id)
         self.cursor.execute(select_sale, [record_id])
         row = self.cursor.fetchall()
         return row
@@ -202,5 +211,5 @@ class DatabaseConnection:
 
     def drop_tables(self, table):
         """This method drops a table"""
-        drop_table = "DROP TABLE IF EXISTS {} CASCADE".format(table)
+        drop_table = "DROP TABLE IF EXISTS {} CASCADE;".format(table)
         self.cursor.execute(drop_table)
