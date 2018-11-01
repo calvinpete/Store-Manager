@@ -106,10 +106,12 @@ class DatabaseConnection:
         user_id = args[0]
         created_on = args[1]
         last_modified = args[2]
-        insert_sales = "INSERT INTO sale_point(user_id, created_on, last_modified ) VALUES('{}', '{}', '{}');"\
-            .format(user_id, created_on, last_modified)
+        insert_sales = "INSERT INTO sale_point(user_id, created_on, last_modified ) " \
+                       "VALUES('{}', '{}', '{}') RETURNING sale_id;".format(user_id, created_on, last_modified)
         self.cursor.execute(insert_sales, (user_id, created_on, last_modified))
         self.connection.commit()
+        column_value = self.cursor.fetchone()[0]
+        return column_value
 
     def insert_sales(self, *args):
         """This method inserts a sale record into the database"""

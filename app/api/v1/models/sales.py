@@ -16,19 +16,19 @@ class Sales:
 
     def sale_order(self):
         """This creates a sale record after for a product to be sold"""
-        db.insert_sale_record(self.user_id, self.created_on, self.last_modified)
-        sale_id = db.select_one('sale_point', 'created_on', self.created_on)[0]
+        sale_id = db.insert_sale_record(self.user_id, self.created_on, self.last_modified)
         return sale_id
 
 
-class SaleProduct(Sales):
+class SaleProduct:
     """This holds logic for managing sales for a particular sale record"""
-    def __init__(self, user_id, product_id, quantity_to_be_sold, payment_mode):
-        Sales.__init__(self, user_id)
+    def __init__(self, sale_id, user_id, product_id, quantity_to_be_sold, payment_mode, last_modified):
+        self.sale_id = sale_id
+        self.user_id = user_id
         self.product_id = product_id
         self.quantity_to_be_sold = quantity_to_be_sold
         self.payment_mode = payment_mode
-        self.sale_id = self.sale_order()
+        self.last_modified = last_modified
 
     def check_available_product(self):
         """This checks if there is enough for sale"""
@@ -40,18 +40,28 @@ class SaleProduct(Sales):
         """This creates a sale record after for a product to be sold"""
         db.insert_sales(self.sale_id, self.product_id, self.quantity_to_be_sold, self.payment_mode)
         db.update_product_quantity(self.quantity_to_be_sold, self.last_modified, self.product_id)
-        return self.created_on
+        return self.last_modified
 
     @staticmethod
     def get_sale_record(record_id):
         """
         This fetches a sale record
         """
+        global sale_single_record
         sale_record = db.select_one_sale(record_id)
         products_sold = []
         grand_total = 0
         if sale_record:
             for column in sale_record:
+                sale_single_record = {
+                    'sale_id': int(record_id),
+                    'created_on': column[6],
+                    'user_id': column[5],
+                    'store_attendant': column[9],
+                    'products_sold': products_sold,
+                    'grand_total': grand_total,
+                    'payment_mode': column[4]
+                }
                 products_sold.append(
                     {
                         'product_id': column[1],
@@ -62,17 +72,7 @@ class SaleProduct(Sales):
                     }
                 )
                 grand_total += column[3]
-                return jsonify(
-                    {
-                        'sale_id': int(record_id),
-                        'created_on': column[6],
-                        'user_id': column[5],
-                        'store_attendant': column[9],
-                        'products_sold': products_sold,
-                        'grand_total': grand_total,
-                        'payment_mode': column[4]
-                    }
-                ), 200
+            return jsonify(sale_single_record), 200
         else:
             return jsonify({"message": "Sale record does not exist"}), 404
 
