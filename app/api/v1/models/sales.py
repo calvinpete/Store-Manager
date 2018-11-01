@@ -7,15 +7,28 @@ db = DatabaseConnection()
 
 
 class Sales:
-    """This class holds the logic for managing sale"""
+    """This class holds the logic for managing a sale record"""
 
-    def __init__(self, *args):
-        self.user_id = args[0]
+    def __init__(self, user_id):
+        self.user_id = user_id
         self.created_on = datetime.datetime.utcnow()
-        self.product_id = args[1]
-        self.quantity_to_be_sold = args[2]
-        self.payment_mode = args[3]
         self.last_modified = datetime.datetime.utcnow()
+
+    def sale_order(self):
+        """This creates a sale record after for a product to be sold"""
+        db.insert_sale_record(self.user_id, self.created_on, self.last_modified)
+        sale_id = db.select_one('sale_point', 'created_on', self.created_on)[0]
+        return sale_id
+
+
+class SaleProduct(Sales):
+    """This holds logic for managing sales for a particular sale record"""
+    def __init__(self, user_id, product_id, quantity_to_be_sold, payment_mode):
+        Sales.__init__(self, user_id)
+        self.product_id = product_id
+        self.quantity_to_be_sold = quantity_to_be_sold
+        self.payment_mode = payment_mode
+        self.sale_id = self.sale_order()
 
     def check_available_product(self):
         """This checks if there is enough for sale"""
@@ -24,11 +37,10 @@ class Sales:
             return True
 
     def sale_product(self):
-        """This creates a sale record after a product is sold"""
-        db.insert_sales(self.user_id, self.created_on, self.product_id,
-                        self.quantity_to_be_sold, self.payment_mode, self.last_modified)
-        sale_record = db.select_one('sales', 'user_id', self.user_id)
-        return sale_record[2]
+        """This creates a sale record after for a product to be sold"""
+        db.insert_sales(self.sale_id, self.product_id, self.quantity_to_be_sold, self.payment_mode)
+        db.update_product_quantity(self.quantity_to_be_sold, self.last_modified, self.product_id)
+        return self.created_on
 
     @staticmethod
     def get_sale_record(record_id):
@@ -42,25 +54,25 @@ class Sales:
             for column in sale_record:
                 products_sold.append(
                     {
-                        'product_id': column[2],
-                        'product_name': column[6],
-                        'details': column[7],
-                        'quantity_sold': column[3],
-                        'total_cost': column[4]
+                        'product_id': column[1],
+                        'product_name': column[7],
+                        'details': column[8],
+                        'quantity_sold': column[2],
+                        'total_cost': column[3]
                     }
                 )
-                grand_total += column[4]
-            return jsonify(
-                {
-                    'record_id': record_id,
-                    'date of sale': sale_record[1],
-                    'user_id': sale_record[0],
-                    'store_attendant': sale_record[8],
-                    'products_sold': products_sold,
-                    'grand_total': grand_total,
-                    'payment_mode': sale_record[5]
-                }
-            ), 200
+                grand_total += column[3]
+                return jsonify(
+                    {
+                        'sale_id': int(record_id),
+                        'created_on': column[6],
+                        'user_id': column[5],
+                        'store_attendant': column[9],
+                        'products_sold': products_sold,
+                        'grand_total': grand_total,
+                        'payment_mode': column[4]
+                    }
+                ), 200
         else:
             return jsonify({"message": "Sale record does not exist"}), 404
 
@@ -71,17 +83,19 @@ class Sales:
         :return:
         """
         all_sales = db.select_all_sales()
-        sales_book = {}
+        sales_book = []
         for sale in all_sales:
-            sales_book[sale[9]] = {
-                'record_id': sale[0],
-                'user_id': sale[1],
-                'date of sale': sale[2],
-                'product_id': sale[3],
+            sale_record = {
+                'sale_id': sale[0],
+                'user_id': sale[5],
+                'created_on': sale[6],
+                'product_id': sale[1],
                 'product_name': sale[7],
+                'store_attendant': sale[9],
                 'details': sale[8],
-                'quantity_sold': sale[4],
-                'total_cost': sale[5],
-                'payment_method': sale[6]
+                'quantity_sold': sale[2],
+                'total_cost': sale[3],
+                'payment_method': sale[4]
             }
+            sales_book.append(sale_record)
         return sales_book
