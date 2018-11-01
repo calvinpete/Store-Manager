@@ -16,37 +16,46 @@ def add_product(current_user):
     if Account.check_admin(current_user) != 'admin':
         return jsonify({"message": "You do not have administrator access"}), 401
 
-    data = request.get_json()
-    if len(data.keys()) != 4:
-        return jsonify({"message": "You should have the product_name, quantity, details and price fields"}), 400
+    try:
 
-    product_name = data['product_name']
-    quantity = data['quantity']
-    details = data['details']
-    price = data['price']
+        data = request.get_json()
+        if len(data.keys()) != 4:
+            return jsonify({"message": "please make sure you have the product_name, quantity, "
+                                       "details and price fields only!"}), 400
 
-    if UserValidator.check_string_input(
-            product_name=product_name,
-            details=details):
-        return jsonify({"message": "Please enter a string"}), 400
+        product_name = data['product_name']
+        quantity = data['quantity']
+        details = data['details']
+        price = data['price']
 
-    if UserValidator.check_integer_input(
-            quantity=quantity,
-            price=price):
-        return jsonify({"message": "Please enter an integer"}), 400
+        if UserValidator.check_string_input(product_name=product_name):
+            return jsonify({"message": "Please note that the product_name value should be a string"}), 400
 
-    if UserValidator.check_input_validity(
-            product_name=product_name,
-            details=details):
-        return jsonify({"message": "Values are required"}), 400
+        if UserValidator.check_string_input(details=details):
+            return jsonify({"message": "Please note that the value of details should be a string"}), 400
 
-    item = Product(product_name, quantity, details, price)
+        if UserValidator.check_integer_input(quantity=quantity):
+            return jsonify({"message": "Please note that the value of quantity should be a positive integer"}), 400
 
-    if not item.check_product_existence():
-        item.add_product()
-        return jsonify({"message": "Product successfully added"}), 201
-    else:
-        return jsonify({"message": "Product already exists"}), 409
+        if UserValidator.check_integer_input(price=price):
+            return jsonify({"message": "Please note that the value of price should be a positive integer"}), 400
+
+        if UserValidator.check_input_validity(product_name=product_name):
+            return jsonify({"message": "Please note that the product_name value is missing"}), 400
+
+        if UserValidator.check_input_validity(details=details):
+            return jsonify({"message": "Please note that the value of details is missing"}), 400
+
+        item = Product(product_name, quantity, details, price)
+
+        if not item.check_product_existence():
+            item.add_product()
+            return jsonify({"message": "Product successfully added"}), 201
+        else:
+            return jsonify({"message": "Product already exists"}), 200
+    except KeyError:
+        return jsonify({"message": "please make sure you have the product_name, quantity, "
+                                   "details and price fields only!"}), 400
 
 
 @app.route('/store-manager/api/v1/products', methods=['GET'])
@@ -72,34 +81,38 @@ def modify_product(current_user, product_id):
 
         data = request.get_json()
         if len(data.keys()) != 4:
-            return jsonify({"message": "You should have the product_name, quantity, details and price fields"}), 400
-
+            return jsonify({"message": "please make sure you have the product_name, quantity, "
+                                       "details and price fields only!"}), 400
         product_name = data['product_name']
         quantity = data['quantity']
         details = data['details']
         price = data['price']
 
-        if UserValidator.check_string_input(
-                product_name=product_name,
-                details=details):
-            return jsonify({"message": "Please enter a string"}), 400
+        if UserValidator.check_string_input(product_name=product_name):
+            return jsonify({"message": "Please note that the product_name value should be a string"}), 400
 
-        if UserValidator.check_integer_input(
-                quantity=quantity,
-                price=price):
-            return jsonify({"message": "Please enter an integer"}), 400
+        if UserValidator.check_string_input(details=details):
+            return jsonify({"message": "Please note that the value of details should be a string"}), 400
 
-        if UserValidator.check_input_validity(
-                product_name=product_name,
-                details=details):
-            return jsonify({"message": "Values are required"}), 400
+        if UserValidator.check_integer_input(quantity=quantity):
+            return jsonify({"message": "Please note that the value of quantity should be a positive integer"}), 400
+
+        if UserValidator.check_integer_input(price=price):
+            return jsonify({"message": "Please note that the value of price should be a positive integer"}), 400
+
+        if UserValidator.check_input_validity(product_name=product_name):
+            return jsonify({"message": "Please note that the product_name value is missing"}), 400
+
+        if UserValidator.check_input_validity(details=details):
+            return jsonify({"message": "Please note that the value of details is missing"}), 400
 
         item = Product(product_name, quantity, details, price)
 
         return item.modify_product(product_id)
 
     except KeyError:
-        return jsonify({"message": "You should have the product_name, quantity, details and price fields"}), 400
+        return jsonify({"message": "please make sure you have the product_name, quantity, "
+                                   "details and price fields only!"}), 400
 
 
 @app.route('/store-manager/api/v1/products/<product_id>', methods=['DELETE'])
