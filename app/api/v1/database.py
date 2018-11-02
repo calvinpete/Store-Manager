@@ -8,58 +8,100 @@ class DatabaseConnection:
     """This class holds all the methods that create, query, update and delete records in the database"""
 
     def __init__(self):
+        self.connection = psycopg2.connect(
+            database="de9iiq47q0aub0",
+            user="qibiumajgxukme",
+            password="8cc471c6ed5a6586e9750db34d6d7cbc2fdf06c07d4028c8c62710030cb470a4",
+            host="ec2-75-101-153-56.compute-1.amazonaws.com",
+            port="5432"
+        )
+        # for connecting to the database
+        self.cursor = self.connection.cursor()
 
-        try:
-            if os.getenv('TESTING_ENV') == 'testing':
-                self.connection = psycopg2.connect(
-                    database="storemanagertestdb", user="postgres", password="hs", host="127.0.0.1", port="5432"
-                )
-            else:
-                self.connection = psycopg2.connect(
-                    database="de9iiq47q0aub0",
-                    user="qibiumajgxukme",
-                    password="8cc471c6ed5a6586e9750db34d6d7cbc2fdf06c07d4028c8c62710030cb470a4",
-                    host="ec2-75-101-153-56.compute-1.amazonaws.com",
-                    port="5432"
-                )
-                # for connecting to the database
-            self.cursor = self.connection.cursor()
+        user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
+                        "name VARCHAR(255) NOT NULL, email_address VARCHAR(255) UNIQUE NOT NULL, " \
+                        "password VARCHAR(500) NOT NULL, account_type VARCHAR(255) NOT NULL, " \
+                        "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
+                        "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        self.cursor.execute(user_table)
+        self.connection.commit()
 
-            user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
-                         "name VARCHAR(255) NOT NULL, email_address VARCHAR(255) UNIQUE NOT NULL, " \
-                         "password VARCHAR(500) NOT NULL, account_type VARCHAR(255) NOT NULL, " \
-                         "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
-                         "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
-            self.cursor.execute(user_table)
-            self.connection.commit()
+        product_table = "CREATE TABLE IF NOT EXISTS products( product_id SERIAL PRIMARY KEY, " \
+                        "product_name VARCHAR(255) NOT NULL, details VARCHAR(255) NOT NULL, " \
+                        "quantity NUMERIC NOT NULL, price NUMERIC NOT NULL, created_on TIMESTAMP NOT NULL, " \
+                        "last_modified TIMESTAMP NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        self.cursor.execute(product_table)
+        self.connection.commit()
 
-            product_table = "CREATE TABLE IF NOT EXISTS products( product_id SERIAL PRIMARY KEY, " \
-                            "product_name VARCHAR(255) NOT NULL, details VARCHAR(255) NOT NULL, " \
-                            "quantity NUMERIC NOT NULL, price NUMERIC NOT NULL, created_on TIMESTAMP NOT NULL, " \
-                            "last_modified TIMESTAMP NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
-            self.cursor.execute(product_table)
-            self.connection.commit()
+        sale_point_table = "CREATE TABLE IF NOT EXISTS sale_point (sale_id SERIAL PRIMARY KEY, " \
+                            "user_id INT NOT NULL REFERENCES users(user_id), " \
+                            "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
+                            "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        self.cursor.execute(sale_point_table)
+        self.connection.commit()
 
-            sale_point_table = "CREATE TABLE IF NOT EXISTS sale_point (sale_id SERIAL PRIMARY KEY, " \
-                               "user_id INT NOT NULL REFERENCES users(user_id), " \
-                               "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
-                               "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
-            self.cursor.execute(sale_point_table)
-            self.connection.commit()
+        sales_table = "CREATE TABLE IF NOT EXISTS sales (record_id SERIAL PRIMARY KEY, " \
+                        "sale_id INT NOT NULL REFERENCES sale_point(sale_id), " \
+                        "product_id INT NOT NULL REFERENCES products(product_id), " \
+                        "quantity_sold NUMERIC NOT NULL, total_cost NUMERIC NOT NULL, " \
+                        "payment_mode VARCHAR(255) NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        self.cursor.execute(sales_table)
+        self.connection.commit()
+        self.default_admin_setup("store_owner", "admin@gmail.com", generate_password_hash("admin00"), "admin",
+                                    datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        print("Database successfully connected")
 
-            sales_table = "CREATE TABLE IF NOT EXISTS sales (record_id SERIAL PRIMARY KEY, " \
-                          "sale_id INT NOT NULL REFERENCES sale_point(sale_id), " \
-                          "product_id INT NOT NULL REFERENCES products(product_id), " \
-                          "quantity_sold NUMERIC NOT NULL, total_cost NUMERIC NOT NULL, " \
-                          "payment_mode VARCHAR(255) NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
-            self.cursor.execute(sales_table)
-            self.connection.commit()
-            self.default_admin_setup("store_owner", "admin@gmail.com", generate_password_hash("admin00"), "admin",
-                                     datetime.datetime.utcnow(), datetime.datetime.utcnow())
-            print("Database successfully connected")
-        except Exception as e:
-            print(e)
-            print("Database failed to connect")
+        # try:
+        #     if os.getenv('TESTING_ENV') == 'testing':
+        #         self.connection = psycopg2.connect(
+        #             database="storemanagertestdb", user="postgres", password="hs", host="127.0.0.1", port="5432"
+        #         )
+        #     else:
+        #         self.connection = psycopg2.connect(
+        #             database="de9iiq47q0aub0",
+        #             user="qibiumajgxukme",
+        #             password="8cc471c6ed5a6586e9750db34d6d7cbc2fdf06c07d4028c8c62710030cb470a4",
+        #             host="ec2-75-101-153-56.compute-1.amazonaws.com",
+        #             port="5432"
+        #         )
+        #         # for connecting to the database
+        #     self.cursor = self.connection.cursor()
+
+        #     user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
+        #                  "name VARCHAR(255) NOT NULL, email_address VARCHAR(255) UNIQUE NOT NULL, " \
+        #                  "password VARCHAR(500) NOT NULL, account_type VARCHAR(255) NOT NULL, " \
+        #                  "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
+        #                  "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        #     self.cursor.execute(user_table)
+        #     self.connection.commit()
+
+        #     product_table = "CREATE TABLE IF NOT EXISTS products( product_id SERIAL PRIMARY KEY, " \
+        #                     "product_name VARCHAR(255) NOT NULL, details VARCHAR(255) NOT NULL, " \
+        #                     "quantity NUMERIC NOT NULL, price NUMERIC NOT NULL, created_on TIMESTAMP NOT NULL, " \
+        #                     "last_modified TIMESTAMP NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        #     self.cursor.execute(product_table)
+        #     self.connection.commit()
+
+        #     sale_point_table = "CREATE TABLE IF NOT EXISTS sale_point (sale_id SERIAL PRIMARY KEY, " \
+        #                        "user_id INT NOT NULL REFERENCES users(user_id), " \
+        #                        "created_on TIMESTAMP NOT NULL, last_modified TIMESTAMP NOT NULL, " \
+        #                        "delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        #     self.cursor.execute(sale_point_table)
+        #     self.connection.commit()
+
+        #     sales_table = "CREATE TABLE IF NOT EXISTS sales (record_id SERIAL PRIMARY KEY, " \
+        #                   "sale_id INT NOT NULL REFERENCES sale_point(sale_id), " \
+        #                   "product_id INT NOT NULL REFERENCES products(product_id), " \
+        #                   "quantity_sold NUMERIC NOT NULL, total_cost NUMERIC NOT NULL, " \
+        #                   "payment_mode VARCHAR(255) NOT NULL, delete_status BOOLEAN NOT NULL DEFAULT FALSE);"
+        #     self.cursor.execute(sales_table)
+        #     self.connection.commit()
+        #     self.default_admin_setup("store_owner", "admin@gmail.com", generate_password_hash("admin00"), "admin",
+        #                              datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        #     print("Database successfully connected")
+        # except Exception as e:
+        #     print(e)
+        #     print("Database failed to connect")
 
     def default_admin_setup(self, *args):
         """This method inserts an admin into the database"""

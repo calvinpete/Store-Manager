@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 @token_required
 def register_staff(current_user):
 
-    if not Account.check_admin(current_user):
+    if Account.check_admin(current_user) != 'admin':
         return jsonify({"message": "You do not have administrator access"}), 401
 
     try:
@@ -40,16 +40,16 @@ def register_staff(current_user):
             return jsonify({"message": "Please note that the account_type value should be a string"}), 400
 
         if UserValidator.check_input_validity(name=name):
-            return jsonify({"message": "Please note that the value of name is missing"}), 400
+            return jsonify({"message": "Please fill in the name"}), 400
 
         if UserValidator.check_input_validity(email_address=email_address):
-            return jsonify({"message": "Please note that the value of email_address is missing"}), 400
+            return jsonify({"message": "Please fill in the email address"}), 400
 
         if UserValidator.check_input_validity(password=password):
-            return jsonify({"message": "Please note that the value of password is missing"}), 400
+            return jsonify({"message": "Please fill in the password"}), 400
 
         if UserValidator.check_input_validity(account_type=account_type):
-            return jsonify({"message": "Please note that the account_type value is missing"}), 400
+            return jsonify({"message": "Please indicate the type of account"}), 400
 
         if not validate.validate_email_address():
             return jsonify({"message": "The email should follow the format of valid emails (johndoe@mail.com)"}), 400
@@ -57,7 +57,7 @@ def register_staff(current_user):
         staff = Account(name, email_address, generate_password_hash(password), account_type)
 
         if staff.check_user():
-            return jsonify({"message": "{} is already exists".format(name)}), 409
+            return jsonify({"message": "{} is already registered".format(name)}), 409
         else:
             user = staff.register()
             return jsonify({"message": "{} has been successfully registered".format(user)}), 201

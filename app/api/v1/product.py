@@ -7,9 +7,6 @@ from app.api.v1.models.accounts import Account
 from app.api.v1.database import DatabaseConnection
 
 
-db = DatabaseConnection()
-
-
 @app.route('/store-manager/api/v1/products', methods=['POST'])
 @token_required
 def add_product(current_user):

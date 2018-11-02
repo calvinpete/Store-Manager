@@ -1,13 +1,10 @@
 from flask import jsonify, request
 from app.api.v1 import app
-from app.api.v1.models.sales import Sales, SaleProduct
+from app.api.v1.models.sales import Sales, SaleProduct, db
 from app.api.v1.database import DatabaseConnection
 from app.api.v1.validator import UserValidator
 from app.api.v1.models.accounts import Account
 from app.api.v1.account import token_required
-
-
-db = DatabaseConnection()
 
 
 @app.route('/store-manager/api/v1/sales', methods=['POST'])

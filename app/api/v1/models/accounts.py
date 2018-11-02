@@ -38,6 +38,8 @@ class Account:
     def get_user_email_address(email_address):
         """This fetches the email_address if it exists"""
         user = db.select_one('users', 'email_address', email_address)  # selects a specific row of the users table
+        if user is None:
+            return None
         return user[2]  # picks the value in the 2nd column of that row
 
     @staticmethod

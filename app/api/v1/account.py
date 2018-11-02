@@ -38,16 +38,22 @@ def login():
 
         validate = UserValidator(email_address, password)
 
+        if UserValidator.check_input_validity(email_address=email_address):
+            return jsonify({"message": "Please fill in your email address"}), 400
+
+        if UserValidator.check_input_validity(password=password):
+            return jsonify({"message": "Please fill in your password"}), 400
+
         if Account.get_user_email_address(email_address) is None:
             return jsonify({"message": "User does not exist, please register"}), 400
 
         if not validate.check_password():
-            return jsonify({"message": "wrong password, please try again"}), 400
+            return jsonify({"message": "Wrong password, please try again"}), 400
         else:
             token = jwt.encode(
                 {
                     "email_address": email_address,
-                    "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+                    "exp": datetime.datetime.utcnow() + datetime.timedelta(days=30)
                 },
                 Config.SECRET_KEY
             )
