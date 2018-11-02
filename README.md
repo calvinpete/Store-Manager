@@ -1,7 +1,6 @@
 
 
-[![Build Status](https://travis-ci.org/calvinpete/Store-Manager.svg?branch=challenge3)](https://travis-ci.org/calvinpete/Store-Manager)
-
+[![Build Status](https://travis-ci.org/calvinpete/Store-Manager.svg?branch=ch-database-%23161533381)](https://travis-ci.org/calvinpete/Store-Manager)       [![Maintainability](https://api.codeclimate.com/v1/badges/361fe7248d69425bf668/maintainability)](https://codeclimate.com/github/calvinpete/Store-Manager/maintainability)
 # Store Manager API Endpoints
 
 The api endpoints enable you to create an admin account, login, register a staff attendant, a product, get a single product, get all products, create a sale record, get a single sale record and get all sale records

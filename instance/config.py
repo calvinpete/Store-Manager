@@ -1,6 +1,9 @@
+import os
+
+
 class Config(object):
     """Parent configuration class"""
-    SECRET_KEY = "VeryHardThoughtKey"
+    SECRET_KEY = os.getenv('SECRET')
     DEBUG = False
     TESTING = False
 
@@ -8,7 +11,7 @@ class Config(object):
 class DevelopmentConfig(Config):
     """Configurations for Development"""
     DEBUG = True
-    DATABASE_URL = "postgresql://calvin:310892@127.0.0.1:5432/storemanager"
+    DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 class TestingConfig(Config):
