@@ -1,10 +1,10 @@
 
 
-[![Build Status](https://travis-ci.org/calvinpete/Store-Manager.svg?branch=develop)](https://travis-ci.org/calvinpete/Store-Manager)    [![Coverage Status](https://coveralls.io/repos/github/calvinpete/Store-Manager/badge.svg)](https://coveralls.io/github/calvinpete/Store-Manager)      [![Maintainability](https://api.codeclimate.com/v1/badges/361fe7248d69425bf668/maintainability)](https://codeclimate.com/github/calvinpete/Store-Manager/maintainability)
+[![Build Status](https://travis-ci.org/calvinpete/Store-Manager.svg?branch=challenge3)](https://travis-ci.org/calvinpete/Store-Manager)
 
 # Store Manager API Endpoints
 
-The api endpoints enable you to create an admin account, login, register a staff attendant,create a category, add a product, get a single product, get all products, create a sale record, get a single sale record and get all sale records
+The api endpoints enable you to create an admin account, login, register a staff attendant, a product, get a single product, get all products, create a sale record, get a single sale record and get all sale records
 
 ## Getting Started
 
@@ -15,7 +15,8 @@ To run the application, make sure you have the following installed on your local
 ```
 Git
 Python 3.6.3
-pip
+postgresql
+pip3
 Virtual Enviroment
 ```
 
@@ -24,7 +25,7 @@ Virtual Enviroment
 Clone the project by running this in the terminal
 
 ```
-git clone https://github.com/calvinpete/Store-Manager.git develop
+git clone https://github.com/calvinpete/Store-Manager.git challenge3
 ```
 
 Activate the virtualenv by running this command in the terminal
@@ -93,7 +94,7 @@ python -m unittest -v
 Clone the project by running this in the CMD
 
 ```
-git clone https://github.com/calvinpete/Store-Manager.git develop
+git clone https://github.com/calvinpete/Store-Manager.git challenge3
 ```
 
 Activate the virtualenv by running this command in the CMD
@@ -135,16 +136,20 @@ nosetests --with-coverage --cover-package=app
 
 |               Endpoint                                        |          Functionality      |
 | --------------------------------------------------------------|:---------------------------:|
-| POST /auth/signup                                             | Create an admin account     |
 | POST /auth/login                                              | Login                       |
-| POST /category                                                | Create a category           |
-| POST /category/product                                        | Add a product               |
-| POST /auth/register                                           | Register a staff attendant  |
-| GET /category/product/product_Id                              | Get a single product        |
+| POST /auth/signup                                             | Register a staff attendant  |    
+| POST /product                                                 | Add a product               |
+| GET /product/product_Id                                       | Get a single product        |
 | GET /product                                                  | Get all products            |
 | POST /sales                                                   | Create a sale record        |
+| DELETE /product/product_Id                                    | Delete a product            |
+| PUT /product/product_Id                                       | Modify a product            |
 | GET /sales/sale_Id                                            | Get a single product        |
 | GET /sales                                                    | Get all products            |
+| POST /inventory                                               | Restock a product           |
+
+
+
 
 
 
