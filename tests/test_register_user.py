@@ -24,6 +24,7 @@ class SignupTestCase(unittest.TestCase):
             self.test_db.drop_tables(table)
 
     def test_user_register(self):
+        """This tests the signup route"""
         self.test_admin_data = {"email_address": "admin@gmail.com",  "password": "admin00"}  # default admin
         admin_response = self.test_app.post('/store-manager/api/v1/auth/login', content_type="application/json",
                                             data=json.dumps(self.test_admin_data))  # admin logging in
@@ -88,116 +89,235 @@ class SignupTestCase(unittest.TestCase):
         self.assertIn("You do not have administrator access", response_message["message"])
 
     def test_nonexistent_field(self):
-        """This tests the register route with missing fields"""
+        """This tests for a signup route without some fields"""
+        self.test_data01 = {"name": "poker", "email_address": "aqpq@gmail.com"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user24), headers={'x-access-token': self.token})
+                                 data=json.dumps(self.test_data01), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("please type in the missing fields", response_message["message"])
+        self.assertIn("please make sure you have the name, email_address, password "
+                      "and account_type fields only!", response_message["message"])
 
-    def test_no_value(self):
-        """This tests the register route with no value in a key value pair"""
-        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user25), headers={'x-access-token': self.token})
-        self.assertTrue(response.status_code, 400)
-        response_message = json.loads(response.data.decode())
-        self.assertIn("Values are required", response_message["message"])
+    def test_no_name_value(self):
+        """This tests for a signup route with no value of name in the key value pair"""
+        self.test_data02 = {"name": "", "email_address": "egrg@gmail.com", "password": "hse",
+                            "account_type": "store_attendant"}
 
-    def test_space_input(self):
-        """This tests the register route with a space character as an input"""
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user26), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data02), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Values are required", response_message["message"])
+        self.assertIn("Please note that the value of name is missing", response_message["message"])
+
+    def test_no_email_address_value(self):
+        """This tests for a signup route with no value of the email_address in the key value pair"""
+        self.test_data03 = {"name": "shakira", "email_address": "", "password": "Kpl",
+                            "account_type": "store_attendant"}
+
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data03), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the value of email_address is missing", response_message["message"])
+
+    def test_no_password_value(self):
+        """This tests for a signup route with no value of the password key"""
+        self.test_data04 = {"name": "sr3rc2", "email_address": "has@gmail.com", "password": "",
+                            "account_type": "store_attendant"}
+
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data04), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the value of password is missing", response_message["message"])
+
+    def test_no_account_type_value(self):
+        """This tests for a signup route with no value of the account_type key"""
+        self.test_data041 = {"name": "sr3rc2", "email_address": "has@gmail.com", "password": "",
+                             "account_type": ""}
+
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data041), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the account_type value is missing", response_message["message"])
+
+    def test_space_input_name(self):
+        """This tests the signup route with a space character in the name value as an input"""
+        self.test_data05 = {"name": "  ", "email_address": "wq2@gmail.com", "password": "1q1k0s",
+                            "account_type": "store_attendant"}
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data05), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the value of name is missing", response_message["message"])
+
+    def test_space_input_email(self):
+        """This tests the signup route with a space character in the name email_address as an input"""
+        self.test_data06 = {"name": "LMZ", "email_address": "     ", "password": "q23",
+                            "account_type": "store_attendant"}
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data06), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the value of email_address is missing", response_message["message"])
+
+    def test_space_input_password(self):
+        """This tests the signup route with a space character in the password value as an input"""
+        self.test_data07 = {"name": "predy", "email_address": "eqpwx@gmail.com", "password": "  ",
+                            "account_type": "store_attendant"}
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data07), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the value of password is missing", response_message["message"])
+
+    def test_space_input_account_type(self):
+        """This tests the signup route with a space character in the account_type value as an input"""
+        self.test_data08 = {"name": "Destra", "email_address": "trap6e@gmail.com", "password": "cal2l2x",
+                            "account_type": "  "}
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data08), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the account_type value is missing", response_message["message"])
 
     def test_name_int_data_type(self):
-        """This tests the register route with the name as an integer"""
+        """This tests the signup route with the value of name as an integer"""
+        self.test_data09 = {"name": 23, "email_address": "J20ed@gmail.com", "password": "4rd2-",
+                            "account_type": "admin"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user12), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data09), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of name should be a string", response_message["message"])
 
     def test_name_float_data_type(self):
-        """This tests the register route with the name as a float"""
+        """This tests the signup route with the value of name as a float"""
+        self.test_data10 = {"name": 23.999, "email_address": "maks2w@gmail.com", "password": "2-",
+                            "account_type": "admin"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user13), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data10), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of name should be a string", response_message["message"])
 
     def test_name_list_data_type(self):
-        """This tests the register route with the name as a list"""
+        """This tests the signup route with the value of name as a list"""
+        self.test_data11 = {"name": [23.999], "email_address": "qwcw@gmail.com", "password": "2-cqcc",
+                            "account_type": "admin"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user14), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data11), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of name should be a string", response_message["message"])
 
     def test_email_address_int_data_type(self):
-        """This tests the register route with the email_address as an integer"""
+        """This tests the signup route with the value of the email_address as an integer"""
+        self.test_data12 = {"name": "lamar", "email_address": 9, "password": "2-cqcc", "account_type": "admin"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user15), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data12), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of email_address should be a string", response_message["message"])
 
     def test_email_address_float_data_type(self):
-        """This tests the register route with the email_address as a float"""
+        """This tests the signup route with the value of the email_address as a float"""
+        self.test_data13 = {"name": "DW", "email_address": 1.2, "password": "float", "account_type": "store_attendant"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user16), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data13), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of email_address should be a string", response_message["message"])
 
     def test_email_address_list_data_type(self):
-        """This tests the register route with the email_address as a list"""
+        """This tests the signup route with the value of the email_address key as a list"""
+        self.test_data14 = {"name": "xwd21", "email_address": [23.999], "password": "2", "account_type": "admin"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user17), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data14), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of email_address should be a string", response_message["message"])
 
     def test_password_int_data_type(self):
-        """This tests the register route with the password as an integer"""
+        """This tests the signup route with the value of the password key as an integer"""
+        self.test_data15 = {"name": "211", "email_address": "thqs @gmail.com", "password": 9,
+                            "account_type": "admin"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user18), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data15), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of password should be a string", response_message["message"])
 
     def test_password_float_data_type(self):
-        """This tests the register route with the password as a float"""
+        """This tests the signup route with the value of the password key as a float"""
+        self.test_data16 = {"name": "qewfv", "email_address": "uyj@gmail.com", "password": 2.9,
+                            "account_type": "admin"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user19), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data16), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of password should be a string", response_message["message"])
 
     def test_password_list_data_type(self):
-        """This tests the register route with the password as a list"""
+        """This tests the signup route with the value of the password key as a list"""
+        self.test_data17 = {"name": "t34", "email_address": "tq23h4@gmail.com", "password": ["ss"],
+                            "account_type": "admin"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user20), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data17), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Please enter a string", response_message["message"])
+        self.assertIn("Please note that the value of password should be a string", response_message["message"])
+
+    def test_account_type_int_data_type(self):
+        """This tests the signup route with the value of the account_type key as an integer"""
+        self.test_data18 = {"name": "211", "email_address": "thqs @gmail.com", "password": "admin",
+                            "account_type": 2}
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data18), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the account_type value should be a string", response_message["message"])
+
+    def test_account_type_float_data_type(self):
+        """This tests the signup route with the value of the account_type key as a float"""
+        self.test_data19 = {"name": "qewfv", "email_address": "uyj@gmail.com", "password": "admin",
+                            "account_type": 2.9}
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data19), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the account_type value should be a string", response_message["message"])
+
+    def test_account_type_list_data_type(self):
+        """This tests the signup route with the value of the account_type key as a list"""
+        self.test_data20 = {"name": "t34", "email_address": "tq23h4@gmail.com", "password": "admin",
+                            "account_type": ["ss"]}
+        response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
+                                      data=json.dumps(self.test_data20), headers={'x-access-token': self.token})
+        self.assertTrue(response.status_code, 400)
+        response_message = json.loads(response.data.decode())
+        self.assertIn("Please note that the account_type value should be a string", response_message["message"])
 
     def test_validate_email_address(self):
-        """This tests the register route with an invalid email_address"""
+        """This tests the signup route with an invalid email_address"""
+        self.test_data21 = {"name": "t3frcf", "email_address": "5u.gmail.com", "password": "wqc",
+                            "account_type": "store_attendant"}
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user21), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data18), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 400)
         response_message = json.loads(response.data.decode())
         self.assertIn("The email should follow the format of valid emails (johndoe@mail.com)",
                       response_message["message"])
 
     def test_user_already_exists(self):
-        """This tests the register route with user credentials already posted"""
+        """This tests the signup route with user credentials already posted"""
+        self.test_data22 = {"name": "calvin", "email_address": "Cn@gmail.com", "password": "cv",
+                            "account_type": "store_attendant"}
         self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                      data=json.dumps(self.test_user29), headers={'x-access-token': self.token})
+                           data=json.dumps(self.test_data22), headers={'x-access-token': self.token})
         response = self.test_app.post('/store-manager/api/v1/auth/signup', content_type="application/json",
-                                 data=json.dumps(self.test_user29), headers={'x-access-token': self.token})
+                                      data=json.dumps(self.test_data22), headers={'x-access-token': self.token})
         self.assertTrue(response.status_code, 409)
         response_message = json.loads(response.data.decode())
-        self.assertIn("Employee already exists", response_message["message"])
+        self.assertIn("calvin is already registered", response_message["message"])
