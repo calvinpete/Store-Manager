@@ -18,7 +18,7 @@ class TestingConfig(Config):
     """Configurations for Testing"""
     TESTING = True
     DEBUG = True
-    DATABASE_URL = "postgresql://calvin:310892@127.0.0.1:5432/storemanagertestdb"
+    DATABASE_URL = "postgresql://postgres:hs@127.0.0.1:5432/storemanagertestdb"
 
 
 class ProductionConfig(Config):
