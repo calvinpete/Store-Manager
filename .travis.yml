@@ -6,7 +6,6 @@ services:
   - postgresql
 
 before_script:
-- "psql -c 'create user calvin with password '310892'; -U postgres"
 - "psql -c 'create database storemanagertestdb;' -U postgres"
 
 #command to install dependencies

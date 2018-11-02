@@ -7,13 +7,13 @@ class DatabaseConnection:
 
     def __init__(self):
         self.connection = psycopg2.connect(
-            database="storemanager", user="calvin", password="310892", host="127.0.0.1", port="5432"
+            database="storemanager", user="postgres", password="hs", host="127.0.0.1", port="5432"
         )
 
         try:
             if app.config['TESTING']:
                 self.connection = psycopg2.connect(
-                    database="storemanagertestdb", user="calvin", password="310892", host="127.0.0.1", port="5432"
+                    database="storemanagertestdb", user="postgres", password="hs", host="127.0.0.1", port="5432"
                 )
 
         except Exception as e:
