@@ -3,7 +3,7 @@ import os
 
 class Config(object):
     """Parent configuration class"""
-    SECRET_KEY = os.getenv('SECRET')
+    SECRET_KEY = "VeryHardThoughtKey"
     DEBUG = False
     TESTING = False
 

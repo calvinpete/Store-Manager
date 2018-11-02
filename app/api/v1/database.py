@@ -16,7 +16,6 @@ class DatabaseConnection:
             port="5432"
         )
         # for connecting to the database
-        self.connection.autocommit = True
         self.cursor = self.connection.cursor()
 
         user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
