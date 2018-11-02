@@ -7,7 +7,11 @@ class DatabaseConnection:
 
     def __init__(self):
         self.connection = psycopg2.connect(
-            database="storemanager", user="postgres", password="hs", host="127.0.0.1", port="5432"
+            database="de9iiq47q0aub0",
+            user="qibiumajgxukme",
+            password="8cc471c6ed5a6586e9750db34d6d7cbc2fdf06c07d4028c8c62710030cb470a4",
+            host="ec2-75-101-153-56.compute-1.amazonaws.com",
+            port="5432"
         )
 
         try:
