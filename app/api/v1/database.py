@@ -223,6 +223,16 @@ class DatabaseConnection:
         self.cursor.execute(delete_row, (last_modified, product_id))
         self.connection.commit()
 
+    # def select_users(self):
+    #     """This method fetches all users"""
+    #     select_users = "SELECT * FROM users;"
+    #     self.cursor.execute(select_users)
+    #     all_users = self.cursor.fetchall()
+    #     users = {}
+    #     for column in all_users:
+    #         users[column[2]] = column[3]
+    #     return users
+
     def drop_tables(self, table):
         """This method drops a table"""
         drop_table = "DROP TABLE IF EXISTS {} CASCADE;".format(table)

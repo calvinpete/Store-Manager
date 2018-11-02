@@ -39,7 +39,7 @@ def login():
 
         validate = UserValidator(email_address, password)
 
-        if Account.get_user_name(email_address) is None:
+        if Account.get_user_email_address(email_address) is None:
             return jsonify({"message": "User does not exist, please register"}), 400
 
         if not validate.check_password():
