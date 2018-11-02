@@ -7,6 +7,8 @@ services:
 
 before_script:
 - "psql -c 'create database storemanagertestdb;' -U postgres"
+- "psql -c 'create database storemanager;' -U postgres"
+
 
 #command to install dependencies
 install:
