@@ -14,6 +14,8 @@ class DatabaseConnection:
                                 host="127.0.0.1",
                                 port="5432"
                                 )
+        self.connection = psycopg2.connect(**self.credentials)
+        self.cursor = self.connection.cursor()
 
         if app.config.get('ENV') == "testing":
             self.credentials['database'] = "storemanagertestdb"
@@ -30,9 +32,6 @@ class DatabaseConnection:
             self.credentials['database'] = "storemanager"
 
         try:
-            self.connection = psycopg2.connect(**self.credentials)
-            self.cursor = self.connection.cursor()
-
             user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
                          "name VARCHAR(255) NOT NULL, email_address VARCHAR(255) UNIQUE NOT NULL, " \
                          "password VARCHAR(500) NOT NULL, account_type VARCHAR(255) NOT NULL, " \
