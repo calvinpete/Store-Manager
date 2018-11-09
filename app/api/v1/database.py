@@ -1,28 +1,36 @@
-import os
 import psycopg2
 import datetime
 from werkzeug.security import generate_password_hash
+from app.api.v1 import app
 
 
 class DatabaseConnection:
     """This class holds all the methods that create, query, update and delete records in the database"""
 
     def __init__(self):
+        self.credentials = dict(database="",
+                                user="postgres",
+                                password="hs",
+                                host="127.0.0.1",
+                                port="5432"
+                                )
+
+        if app.config.get('ENV') == "testing":
+            self.credentials['database'] = "storemanagertestdb"
+
+        if app.config.get('ENV') == "production":
+            self.credentials = dict(database="de9iiq47q0aub0",
+                                    user="qibiumajgxukme",
+                                    password="8cc471c6ed5a6586e9750db34d6d7cbc2fdf06c07d4028c8c62710030cb470a4",
+                                    host="ec2-75-101-153-56.compute-1.amazonaws.com",
+                                    port="5432"
+                                    )
+
+        if app.config.get('ENV') == "development":
+            self.credentials['database'] = "storemanager"
 
         try:
-            if os.getenv('TESTING_ENV') == 'testing':
-                self.connection = psycopg2.connect(
-                    database="storemanagertestdb", user="postgres", password="hs", host="127.0.0.1", port="5432"
-                )
-            else:
-                self.connection = psycopg2.connect(
-                    database="de9iiq47q0aub0",
-                    user="qibiumajgxukme",
-                    password="8cc471c6ed5a6586e9750db34d6d7cbc2fdf06c07d4028c8c62710030cb470a4",
-                    host="ec2-75-101-153-56.compute-1.amazonaws.com",
-                    port="5432"
-                )
-                # for connecting to the database
+            self.connection = psycopg2.connect(**self.credentials)
             self.cursor = self.connection.cursor()
 
             user_table = "CREATE TABLE IF NOT EXISTS users(user_id SERIAL PRIMARY KEY, " \
@@ -56,7 +64,6 @@ class DatabaseConnection:
             self.connection.commit()
             self.default_admin_setup("store_owner", "admin@gmail.com", generate_password_hash("admin00"), "admin",
                                      datetime.datetime.utcnow(), datetime.datetime.utcnow())
-            print("Database successfully connected")
         except Exception as e:
             print(e)
             print("Database failed to connect")
