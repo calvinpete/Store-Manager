@@ -2,18 +2,18 @@ import unittest
 import json
 from app.api.v1.database import DatabaseConnection
 from app.api.v1 import app
+from instance.config import app_config
 
 
 class LoginTestCase(unittest.TestCase):
     """This tests the login route"""
     def setUp(self):
+        app.config.from_object(app_config["testing"])
         self.test_app = app.test_client()
         self.test_db = DatabaseConnection()
-        self.table_list = ['users', 'sales', 'products', 'sale_point']
 
     def tearDown(self):
-        for table in self.table_list:
-            self.test_db.drop_tables(table)
+        self.test_db.drop_tables('users')
 
     def test_admin_login(self):
         self.test_admin_data = {"email_address": "admin@gmail.com",  "password": "admin00"}
@@ -22,3 +22,7 @@ class LoginTestCase(unittest.TestCase):
         self.assertTrue(response.status_code, 200)
         response_message = json.loads(response.data.decode())
         self.assertIn("You have successfully logged in", response_message["message"])
+
+
+if __name__ == "__main__":
+    unittest.main()
