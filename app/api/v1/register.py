@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 @token_required
 def register_staff(current_user):
 
-    if not Account.check_admin(current_user):
+    if Account.check_admin(current_user) != 'admin':
         return jsonify({"message": "You do not have administrator access"}), 401
 
     try:
